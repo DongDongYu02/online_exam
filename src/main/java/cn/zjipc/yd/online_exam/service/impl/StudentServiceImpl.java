@@ -13,6 +13,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -21,19 +22,15 @@ public class StudentServiceImpl implements StudentService {
     private final QuestionMapper questionMapper;
     private final PaperMapper paperMapper;
     private final StudentScoresMapper studentScoresMapper;
-    private final StudentExamTempMapper studentExamTempMapper;
 
-    private final StudentAnswerTempMapper studentAnswerTempMapper;
 
     private final RedisTemplate redisTemplate;
 
-    public StudentServiceImpl(StudentMapper studentMapper, QuestionMapper questionMapper, PaperMapper paperMapper, StudentScoresMapper studentScoresMapper, StudentExamTempMapper studentExamTempMapper, StudentAnswerTempMapper studentAnswerTempMapper, RedisTemplate redisTemplate) {
+    public StudentServiceImpl(StudentMapper studentMapper, QuestionMapper questionMapper, PaperMapper paperMapper, StudentScoresMapper studentScoresMapper, RedisTemplate redisTemplate) {
         this.studentMapper = studentMapper;
         this.questionMapper = questionMapper;
         this.paperMapper = paperMapper;
         this.studentScoresMapper = studentScoresMapper;
-        this.studentExamTempMapper = studentExamTempMapper;
-        this.studentAnswerTempMapper = studentAnswerTempMapper;
         this.redisTemplate = redisTemplate;
     }
 
@@ -76,6 +73,8 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Integer referExam( String papName, Integer stuId) {
+        //删除考试倒计时kv
+        redisTemplate.delete("stuExamRemaining:"+stuId);
         //查询试卷答案
         List<SubmitAnswer> answers = questionMapper.getPaperAnswerByPaperName(papName);
 
@@ -108,36 +107,37 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public void addStudentExamTemp(Integer stuId, String papName) {
         Paper paper = paperMapper.getPaperWithQuestionByPapName(papName);
-        //获取考试时长
-        Integer examTime = paper.getExamTime();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        //获取开始考试的时间
-        Date start = new Date();
-        String startTime = simpleDateFormat.format(start);
-        //获取考试结束时间
-        Date end = new Date();
-        end.setTime(start.getTime() + (examTime * 60 * 1000));
-        String endTime = simpleDateFormat.format(end);
+//        //获取考试时长
+//        Integer examTime = paper.getExamTime();
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        //获取开始考试的时间
+//        Date start = new Date();
+//        String startTime = simpleDateFormat.format(start);
+//        //获取考试结束时间
+//        Date end = new Date();
+//        end.setTime(start.getTime() + (examTime * 60 * 1000));
+//        String endTime = simpleDateFormat.format(end);
         //保存考生考试临时数据
-        studentExamTempMapper.addStudentExamTemp(stuId, papName, startTime, endTime);
+//        studentExamTempMapper.addStudentExamTemp(stuId, papName, startTime, endTime);
+
+        //考生开始开始后，将考生以及试卷信息存入redis并设置过期时间为考试时长 作为倒计时
+        redisTemplate.opsForValue().set("stuExamRemaining:"+stuId,papName,paper.getExamTime(), TimeUnit.MINUTES);
     }
 
     @Override
     public String getExamTempPapNameByStuId(Integer stuId) {
-        return studentExamTempMapper.getPapNameByStuId(stuId);
+        return (String) redisTemplate.opsForValue().get("stuExamRemaining:"+stuId);
     }
+
 
     @Override
     public long getExamRemaining(Integer stuId, String papName) throws ParseException {
-        String examEndTime = studentExamTempMapper.getExamEndTimeByStuIdAndPapName(stuId, papName);
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        return simpleDateFormat.parse(examEndTime).getTime() - new Date().getTime();
+//        String examEndTime = studentExamTempMapper.getExamEndTimeByStuIdAndPapName(stuId, papName);
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        return simpleDateFormat.parse(examEndTime).getTime() - new Date().getTime();
+        return redisTemplate.getExpire("stuExamRemaining:"+stuId) * 1000;
     }
 
-    @Override
-    public int deleteExamTemp(Integer stuId) {
-        return studentExamTempMapper.deleteExamTemp(stuId);
-    }
 
 
 }

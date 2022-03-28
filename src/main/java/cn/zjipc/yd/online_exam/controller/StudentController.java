@@ -1,7 +1,6 @@
 package cn.zjipc.yd.online_exam.controller;
 
 import cn.zjipc.yd.online_exam.bean.*;
-import cn.zjipc.yd.online_exam.mapper.StudentExamTempMapper;
 import cn.zjipc.yd.online_exam.service.StudentService;
 import cn.zjipc.yd.online_exam.utils.WebUtil;
 import com.github.pagehelper.Page;
@@ -84,7 +83,6 @@ public class StudentController {
                 return new AjaxMsg(true, "获取成功", examPaper);
             }
             if (examPaper != null) {
-                studentService.deleteExamTemp(student.getId());
                 return new AjaxMsg(false, "考试结束");
             }
         }
@@ -131,7 +129,6 @@ public class StudentController {
         if (user instanceof Student) {
             Student student = (Student) user;
             String paperName = (String) request.getSession().getAttribute("papName");
-            studentService.deleteExamTemp(student.getId());
             if (studentService.referExam(paperName, student.getId()) > 0) {
                 return new AjaxMsg(true, WebUtil.getRequestIP(request));
             }

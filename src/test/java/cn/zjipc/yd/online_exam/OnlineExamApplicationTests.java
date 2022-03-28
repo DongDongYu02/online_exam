@@ -4,19 +4,15 @@ import cn.zjipc.yd.online_exam.bean.Paper;
 import cn.zjipc.yd.online_exam.bean.Question;
 import cn.zjipc.yd.online_exam.bean.SubmitAnswer;
 import cn.zjipc.yd.online_exam.mapper.QuestionMapper;
-import cn.zjipc.yd.online_exam.mapper.StudentExamTempMapper;
 import cn.zjipc.yd.online_exam.mapper.StudentMapper;
 import cn.zjipc.yd.online_exam.mapper.StudentScoresMapper;
 import cn.zjipc.yd.online_exam.utils.StudentUtil;
 import org.junit.jupiter.api.Test;
-import org.reactivestreams.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @SpringBootTest
@@ -109,40 +105,40 @@ class OnlineExamApplicationTests {
         Integer integer = studentScoresMapper.countPaperNameByStuId(2210001, "JAVA基础考试-软件工程");
         System.out.println(integer);
     }
-    @Autowired
-    private StudentExamTempMapper studentExamTempMapper;
-    @Test
-    void countDownTest() throws ParseException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        String startTime = simpleDateFormat.format(date);
-        System.out.println(startTime);
-        date.setTime(date.getTime() + (120 * 60 * 1000));
-        String endTime = simpleDateFormat.format(date);
-        System.out.println(endTime);
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        long time = simpleDateFormat.parse(endTime).getTime();
-        long l = time - new Date().getTime();
-        System.out.println(l);
-
-        studentExamTempMapper.addStudentExamTemp(220001,"JAVA基础考试",startTime,endTime);
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        String temp = studentExamTempMapper.getExamEndTimeByStuIdAndPapName(220001, "JAVA基础考试");
-        long l1 = simpleDateFormat.parse(temp).getTime() - new Date().getTime();
-        System.out.println(l1);
-
-        System.out.println("==========>"+studentExamTempMapper.getPapNameByStuId(220001));
-
-
-    }
+//    @Autowired
+//    private StudentExamTempMapper studentExamTempMapper;
+//    @Test
+//    void countDownTest() throws ParseException {
+//        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+//        Date date = new Date();
+//        String startTime = simpleDateFormat.format(date);
+//        System.out.println(startTime);
+//        date.setTime(date.getTime() + (120 * 60 * 1000));
+//        String endTime = simpleDateFormat.format(date);
+//        System.out.println(endTime);
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//        long time = simpleDateFormat.parse(endTime).getTime();
+//        long l = time - new Date().getTime();
+//        System.out.println(l);
+//
+//        studentExamTempMapper.addStudentExamTemp(220001,"JAVA基础考试",startTime,endTime);
+//        try {
+//            Thread.sleep(1000);
+//        } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//        }
+//        String temp = studentExamTempMapper.getExamEndTimeByStuIdAndPapName(220001, "JAVA基础考试");
+//        long l1 = simpleDateFormat.parse(temp).getTime() - new Date().getTime();
+//        System.out.println(l1);
+//
+//        System.out.println("==========>"+studentExamTempMapper.getPapNameByStuId(220001));
+//
+//
+//    }
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
     @Test

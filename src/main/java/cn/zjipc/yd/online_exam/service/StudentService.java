@@ -57,7 +57,6 @@ public interface StudentService {
     /**
      * 阅卷
      *
-     * @param submitAnswers 学生提交的题目与答案
      * @param papName       试卷名称
      * @param stuId         学生id
      */
@@ -103,12 +102,5 @@ public interface StudentService {
      */
     long getExamRemaining(Integer stuId, String papName) throws ParseException;
 
-    /**
-     * 删除学生当前考试临时数据
-     * 通常在学生交卷后或者考试时间到后执行
-     *
-     * @param stuId 学生id
-     */
-    int deleteExamTemp(Integer stuId);
 
 }
