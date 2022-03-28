@@ -1,6 +1,7 @@
 hello git!
 edite ！
 edite ！！
+<<<<<<< HEAD
 idea commit!!
 test edit!!
 master edit!!
