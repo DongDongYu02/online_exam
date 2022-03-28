@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zjipc.yd.online_exam.mapper.PaperMapper">
+    <insert id="addPaper">
+        insert into tb_paper(`pap_name`, `pap_major`, `startTime`, `endTime`,`examTime`)
+        values (#{papName}, #{papMajor}, #{startTime}, #{endTime},#{examTime})
+    </insert>
+    <update id="updatePaper">
+        update tb_paper
+        <trim prefix="set" suffixOverrides=",">
+            <if test="papName != null">
+                `pap_name` = #{papName},
+            </if>
+            <if test="papMajor != null">
+                `pap_major` = #{papMajor},
+            </if>
+            <if test="startTime != null">
+                `startTime` = #{startTime},
+            </if>
+            <if test="endTime != null">
+                `endTime` = #{endTime},
+            </if>
+            <if test="examTime != null">
+                `examTime` = #{examTime}
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="deletePaper">
+        delete
+        from tb_paper
+        where id = #{id}
+    </delete>
+
+    <select id="getAllPaper" resultType="cn.zjipc.yd.online_exam.bean.Paper">
+        select *
+        from tb_paper
+    </select>
+    <select id="getPaperById" resultType="cn.zjipc.yd.online_exam.bean.Paper">
+        select *
+        from tb_paper
+        where id = #{id}
+    </select>
+    <select id="getPaperListByMajor" resultType="cn.zjipc.yd.online_exam.bean.Paper">
+        select * from tb_paper where pap_major = #{major}
+    </select>
+    <resultMap id="paperQuestion" type="cn.zjipc.yd.online_exam.bean.Paper">
+        <id column="id" property="id"/>
+        <result column="pap_Name" property="papName"/>
+        <result column="pap_Major" property="papMajor"/>
+        <result column="examTime" property="examTime"/>
+        <collection property="singleQuestion" column="pap_Name"
+                    ofType="cn.zjipc.yd.online_exam.bean.Question"
+                    select="cn.zjipc.yd.online_exam.mapper.QuestionMapper.getSingleQuestionListByPapName">
+        </collection>
+        <collection property="multiQuestion" column="pap_Name"
+                    ofType="cn.zjipc.yd.online_exam.bean.Question"
+                    select="cn.zjipc.yd.online_exam.mapper.QuestionMapper.getMultiQuestionListByPapName">
+        </collection>
+        <collection property="judgeQuestion" column="pap_Name"
+                    ofType="cn.zjipc.yd.online_exam.bean.Question"
+                    select="cn.zjipc.yd.online_exam.mapper.QuestionMapper.getJudgeQuestionListByPapName">
+        </collection>
+    </resultMap>
+    <select id="getPaperWithQuestionByPapName" resultMap="paperQuestion">
+        select * from tb_paper where pap_name = #{papName}
+    </select>
+    <resultMap id="paperQuestions" type="cn.zjipc.yd.online_exam.bean.Paper">
+        <id column="id" property="id"/>
+        <result column="pap_Name" property="papName"/>
+        <result column="pap_Major" property="papMajor"/>
+        <result column="examTime" property="examTime"/>
+        <collection property="questionList" column="pap_Name"
+                    ofType="cn.zjipc.yd.online_exam.bean.Question"
+                    select="cn.zjipc.yd.online_exam.mapper.QuestionMapper.getQuestionByPaperName">
+        </collection>
+    </resultMap>
+    <select id="getPaperWithQuestionsByPapName" resultMap="paperQuestions">
+    </select>
+    <select id="getPaperByPapName" resultType="cn.zjipc.yd.online_exam.bean.Paper">
+        select * from tb_paper where upper(pap_name) = upper(#{papName})
+    </select>
+</mapper>

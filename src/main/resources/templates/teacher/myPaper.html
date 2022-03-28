@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Quick Test 教师</title>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <script th:src="@{/js/vue.min.js}"></script>
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/animate.min.css}"/> <!-- 动画效果 -->
+    <link rel="stylesheet" th:href="@{/css/jquery-confirm.min.css}"/>
+
+
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Quick Test</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#"  th:text="${session.user.getTeaName()}"></a></li>
+                <li><a th:href="@{/userLogout}">注销</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!--侧边栏 start-->
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li class="active"><a th:href="@{/teacher}">HOME<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/teacher/studentInfo}">我的学生 <span class="sr-only">(current)</span></a></li>
+                <li class="nav_select"><a th:href="@{/teacher/myPaperManage}">我的专业试题管理</a></li>
+            </ul>
+
+        </div>
+        <!--侧边栏 end-->
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id="paper_list_table">
+            <h2 class="sub-header" th:text="'【'+${session.user.teaMajor}+'】专业试卷列表'"></h2>
+            <!--添加删除按钮 start-->
+            <div class="row">
+                <div class="col-md-2 col-md-offset-10">
+                    <button type="button" id="paper_add_btn" class="btn btn-success" @click="add">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"> 添加试卷</span>
+                    </button>
+
+                    <!-- 添加试卷模态框 start-->
+                    <div class="modal fade" id="paper_add_model" tabindex="-1" role="dialog"
+                         aria-labelledby="paperModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="paperModalLabel">添加试卷</h4>
+                                </div>
+                                <!--  输入框 start-->
+                                <div class="modal-body">
+                                    <form class="form-horizontal">
+                                        <div class="form-group"
+                                             :class="{'has-error' : newPapNameHasError}">
+                                            <label for="addInputName1" class="col-sm-2 control-label">试卷名称</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="AddInputName1"
+                                                       placeholder="paper name" name="papName"
+                                                       ref="newPapNameRef"
+                                                       v-model="newPaperInfo.papName">
+                                                <span id="helpBlock1" class="help-block">
+                                                    {{newPapNameErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group"
+                                             :class="{'has-error' : newStartTimeHasError}">
+                                            <label for="addInputName2" class="col-sm-2 control-label">开始时间</label>
+                                            <div class="col-sm-10">
+                                                <input type="datetime-local" class="form-control" id="AddInputName2"
+                                                       placeholder="start time" name="startTime"
+                                                       ref="newStartTimeRef"
+                                                       v-model="newPaperInfo.startTime">
+                                                <span id="helpBlock3" class="help-block">
+                                                    {{newStartTimeErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group"
+                                             :class="{'has-error' : newEndTimeHasError}">
+                                            <label for="addInputName3" class="col-sm-2 control-label">结束时间</label>
+                                            <div class="col-sm-10">
+                                                <input type="datetime-local" class="form-control" id="AddInputName3"
+                                                       placeholder="end time" name="endTime"
+                                                       ref="newEndTimeRef"
+                                                       v-model="newPaperInfo.endTime">
+                                                <span id="helpBlock4" class="help-block">
+                                                    {{newEndTimeErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group"
+                                             :class="{'has-error' : newExamTimeHasError}">
+                                            <label class="col-sm-2 control-label">考试时长(分钟)</label>
+                                            <div class="col-sm-3">
+                                                <select class="form-control"
+                                                        ref="newExamTimeRef"
+                                                        v-model="newPaperInfo.examTime">
+                                                    <option>60</option>
+                                                    <option>90</option>
+                                                    <option>120</option>
+                                                </select>
+                                                <span id="helpBlock5" class="help-block">
+                                                    {{newExamTimeErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!--  输入框 end-->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default"
+                                            @click="closeAddModal">关闭
+                                    </button>
+                                    <button type="button" class="btn btn-primary" @click="addPaper">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 添加试卷模态框 end-->
+                    <button type="button" class="btn btn-danger">删除</button>
+
+                </div>
+            </div>
+            <!--添加删除按钮 end-->
+
+            <!--试卷列表 start-->
+            <div class="table-responsive" >
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>试卷名</th>
+                        <th>考试开始时间</th>
+                        <th>考试结束时间</th>
+                        <th>考试时长</th>
+                        <th>操作(查看试题/修改信息/删除)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="paper in pageInfo.list">
+                        <td>{{paper.papName}}</td>
+                        <td>{{paper.startTime}}</td>
+                        <td>{{paper.endTime}}</td>
+                        <td>{{paper.examTime}}</td>
+                        <td>
+                            <div class="btn-group" role="group" aria-label="teacher_btn_group">
+                                <!--查看试题按钮 start-->
+                                <button type="button" id="paper_check_btn" class="btn btn-default" @click="checkQuestions(paper.papName)"  >
+                                       <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                                </button>
+                                <!--查看试题按钮 start-->
+
+                                <!--修改试卷按钮 start-->
+                                <button type="button" id="paper_update_btn" class="btn btn-default" @click="update(paper.id)">
+                                    <span class="glyphicon glyphicon-wrench" aria-hidden="true"></span>
+                                </button>
+                                <!--修改试卷按钮 end-->
+
+                                <!--删除试卷按钮 start-->
+                                <button type="button" id="paper_delete_btn" class="btn btn-default" @click="del(paper.id)">
+                                    <span class="glyphicon glyphicon-minus" aria-hidden="true"></span>
+                                </button>
+                                <!--删除试卷按钮 end-->
+
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <!--分页导航 start-->
+                <div class="col-md-4">
+                    <span class="label label-primary">第{{pageInfo.pageNum}}页</span>
+                    <span class="label label-success">共{{pageInfo.pages}}页</span>
+                    <span class="label label-info">共{{pageInfo.total}}套试卷</span>
+                </div>
+                <nav aria-label="Page navigation " class="col-lg-offset-9">
+                    <ul class="pagination">
+                        <li :class="{disabled:pageInfo.isFirstPage}">
+                            <a @click="getPageInfo(1)">首页</a>
+                        </li>
+                        <li v-show="!pageInfo.isFirstPage">
+                            <a aria-label="Previous" @click="getPageInfo(pageInfo.prePage)">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li v-for="page in pageInfo.navigatepageNums" :class="{active:page == pageInfo.pageNum}">
+                            <a @click="getPageInfo(page)">{{page}}</a>
+                        </li>
+                        <li v-show="!pageInfo.isLastPage">
+                            <a aria-label="Next" @click="getPageInfo(pageInfo.nextPage)">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li :class="{disabled:pageInfo.isLastPage}">
+                            <a @click="getPageInfo(pageInfo.pages)">末页</a>
+                        </li>
+                    </ul>
+                </nav>
+                <!--分页导航 end-->
+            </div>
+            <!-- 修改试卷信息模态框 start-->
+            <div class="modal fade" id="paper_update_model" tabindex="-1" role="dialog"
+                 aria-labelledby="updateModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal"
+                                    aria-label="Close"><span
+                                    aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title" id="updateModalLabel">修改试卷信息</h4>
+                        </div>
+                        <!--  输入框 start-->
+                        <div class="modal-body">
+                            <form class="form-horizontal">
+                                <div class="form-group"
+                                     :class="{'has-error' : updatePapNameHasError}">
+                                    <label for="updateInputName1" class="col-sm-2 control-label">试卷名称</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="updateInputName1"
+                                               placeholder="paper name" name="papName"
+                                               ref="updatePapNameRef"
+                                               v-model="updatePaperInfo.papName">
+                                        <span id="helpBlock1-update" class="help-block">
+                                             {{updatePapNameErrorMsg}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="updateInputName2" class="col-sm-2 control-label">开始时间</label>
+                                    <div class="col-sm-10">
+                                        <input type="datetime-local" class="form-control" id="updateInputName2"
+                                               placeholder="start time"
+                                               name="startTime"
+                                               v-model="updatePaperInfo.startTime">
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label for="updateInputName3" class="col-sm-2 control-label">结束时间</label>
+                                    <div class="col-sm-10">
+                                        <input type="datetime-local" class="form-control" id="updateInputName3"
+                                               placeholder="end time"
+                                               name="endTime"
+                                               v-model="updatePaperInfo.endTime">
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">考试时长(分钟)</label>
+                                    <div class="col-sm-3">
+                                        <select class="form-control"
+                                                v-model="updatePaperInfo.examTime">
+                                            <option>60</option>
+                                            <option>90</option>
+                                            <option>120</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!--  输入框 end-->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                    data-dismiss="modal">关闭
+                            </button>
+                            <button type="button" class="btn btn-primary" @click="updatePaper">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 修改试卷信息模态框 end-->
+            <!--试卷列表 end-->
+
+
+        </div>
+        <script th:src="@{/js/teacher/my_paper_manage.js}"></script>
+    </div>
+</div>
+<script th:src="@{/js/jquery.hDialog.js}"></script>
+<script th:src="@{/js/jquery-confirm.min.js}"></script>
+
+
+
+
+</body>
+</html>

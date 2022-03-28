@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zjipc.yd.online_exam.mapper.StudentMapper">
+
+    <insert id="addStudent">
+        insert into tb_student(`stu_name`, `stu_major`, `stu_password`, `stu_tel`)
+        values (#{stuName}, #{stuMajor}, #{stuPassword}, #{stuTel})
+    </insert>
+    <update id="updateStudent">
+        update tb_student
+        <trim prefix="set" suffixOverrides=",">
+            <if test="stuName != null">
+                `stu_name` = #{stuName},
+            </if>
+            <if test="stuPassword != null">
+                `stu_password` = #{stuPassword},
+            </if>
+            <if test="stuMajor != null">
+                `stu_major` = #{stuMajor},
+            </if>
+            <if test="stuTel != null">
+                `stu_tel` = #{stuTel}
+            </if>
+        </trim>
+        where id=#{id}
+    </update>
+    <delete id="deleteStudentById">
+        delete from tb_student where id = #{id}
+    </delete>
+
+    <select id="getStudentList" resultType="cn.zjipc.yd.online_exam.bean.Student">
+        select *
+        from tb_student
+    </select>
+    <select id="getStudentById" resultType="cn.zjipc.yd.online_exam.bean.Student">
+        select * from tb_student where id = #{id}
+    </select>
+    <select id="getPaperListByStuMajor" resultType="cn.zjipc.yd.online_exam.bean.Paper">
+       select * from tb_paper where pap_major = #{papMajor}
+    </select>
+    <resultMap id="paperQuestion" type="cn.zjipc.yd.online_exam.bean.Paper">
+        <id column="id" property="id"/>
+        <result column="pap_Name" property="papName"/>
+        <result column="pap_Major" property="papMajor"/>
+        <collection property="singleQuestion" column="pap_Name"
+                    ofType="cn.zjipc.yd.online_exam.bean.Question"
+                    select="cn.zjipc.yd.online_exam.mapper.QuestionMapper.getSingleQuestionListByPapName">
+        </collection>
+        <collection property="multiQuestion" column="pap_Name"
+                    ofType="cn.zjipc.yd.online_exam.bean.Question"
+                    select="cn.zjipc.yd.online_exam.mapper.QuestionMapper.getMultiQuestionListByPapName">
+        </collection>
+        <collection property="judgeQuestion" column="pap_Name"
+                    ofType="cn.zjipc.yd.online_exam.bean.Question"
+                    select="cn.zjipc.yd.online_exam.mapper.QuestionMapper.getJudgeQuestionListByPapName">
+        </collection>
+    </resultMap>
+    <select id="getPaperQuestionByPapName" resultMap="paperQuestion">
+        select * from tb_paper where pap_name = #{papName}
+    </select>
+    <select id="getStudentByIdAndPassword" resultType="cn.zjipc.yd.online_exam.bean.Student">
+        select * from tb_student where id = #{id} and `stu_password` = #{stuPassword}
+    </select>
+    <select id="getStudentByStuMajor" resultType="cn.zjipc.yd.online_exam.bean.Student">
+        select * from tb_student where stu_major = #{stuMajor}
+    </select>
+
+</mapper>

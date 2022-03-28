@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zjipc.yd.online_exam.mapper.StudentScoresMapper">
+
+    <insert id="addStudentScores">
+        insert into `tb_student_scores`(`stu_id`,`stu_name`,`stu_major`,`pap_name`,`score`)
+        values (#{stuId},#{stuName},#{stuMajor},#{papName},#{score})
+    </insert>
+    <select id="getStudentScoresByStuId" resultType="cn.zjipc.yd.online_exam.bean.StudentScores">
+        select * from tb_student_scores where `stu_id` = #{stuId}
+    </select>
+    <select id="countPaperNameByStuId" resultType="java.lang.Integer">
+        SELECT COUNT(`pap_name`) FROM tb_student_scores where `stu_id` = #{stuId} and `pap_name` = #{papName}
+    </select>
+</mapper>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Quick Test 考试页</title>
+    <script th:src="@{/js/axios.min.js}"></script>
+    <script th:src="@{/js/vue.min.js}"></script>
+
+    <link th:href="@{/css/offcanvas.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/animate.min.css}"/> <!-- 动画效果 -->
+    <link rel="stylesheet" th:href="@{/css/jquery-confirm.min.css}"/>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+</head>
+
+<body>
+<nav class="navbar navbar-fixed-top navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Quick Test</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">考试页面</a></li>
+            </ul>
+        </div><!-- /.nav-collapse -->
+    </div><!-- /.container -->
+</nav><!-- /.navbar -->
+
+<div class="container">
+
+    <div class="row row-offcanvas row-offcanvas-right" id="exam_paper">
+
+        <div class="col-xs-12 col-sm-9">
+            <p class="pull-right visible-xs">
+                <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+            </p>
+            <div class="jumbotron">
+                <h2 th:text="${session.papName}"></h2>
+                <p>考试已开始，请注意考试时长，细心答题！</p>
+            </div>
+            <div class="row">
+                <div class="panel panel-primary" v-for="question in questions">
+                    <div class="panel-heading">
+                        {{pageInfo.pageNum}}、{{question.queName}}
+                        <span v-show="question.queType == 1">
+                            （2分）
+                        </span>
+                        <span v-show="question.queType == 2">
+                            （3分）
+                        </span>
+                        <span v-show="question.queType == 3">
+                            （1分）
+                        </span>
+                    </div>
+                    <div class="panel-body">
+                        <template v-if="question.queType == 1">
+                            <p>
+                                <label class="radio-inline">
+                                    <input  class="option" type="radio" name="singleAnswer" id="singleAnswer1" value="A" @change="isAnswer">
+                                    A、{{question.queOption1}}
+                                </label>
+                            </p>
+                            <p>
+                                <label class="radio-inline">
+                                    <input  class="option" type="radio" name="singleAnswer" id="singleAnswer2" value="B" @change="isAnswer" >
+                                    B、{{question.queOption2}}
+                                </label>
+                            </p>
+                            <p>
+                                <label class="radio-inline">
+                                    <input  class="option" type="radio" name="singleAnswer" id="singleAnswer3" value="C" @change="isAnswer">
+                                    C、{{question.queOption3}}
+                                </label>
+                            </p>
+                            <p>
+                                <label class="radio-inline">
+                                    <input class="option" type="radio" name="singleAnswer" id="singleAnswer4" value="D" @change="isAnswer">
+                                    D、{{question.queOption4}}
+                                </label>
+                            </p>
+                        </template>
+                        <template v-if="question.queType == 2">
+                            <p>
+                                <label class="checkbox-inline">
+                                    <input  class="option" type="checkbox" name="multiAnswer"
+                                            id="multiAnswer1" v-model="multiAnswer" value="A" @change="isAnswer">
+                                    A、{{question.queOption1}}
+                                </label>
+                            </p>
+                            <p>
+                                <label class="checkbox-inline">
+                                    <input  class="option" type="checkbox" name="multiAnswer"
+                                            id="multiAnswer2" v-model="multiAnswer" value="B" @change="isAnswer" >
+                                    B、{{question.queOption2}}
+                                </label>
+                            </p>
+                            <p>
+                                <label class="checkbox-inline">
+                                    <input  class="option" type="checkbox" name="multiAnswer"
+                                            id="multiAnswer3" v-model="multiAnswer" value="C" @change="isAnswer">
+                                    C、{{question.queOption3}}
+                                </label>
+                            </p>
+                            <p>
+                                <label class="checkbox-inline">
+                                    <input class="option" type="checkbox" name="multiAnswer"
+                                           id="multiAnswer4" v-model="multiAnswer" value="D" @change="isAnswer">
+                                    D、{{question.queOption4}}
+                                </label>
+                            </p>
+                        </template>
+                        <template v-if="question.queType == 3">
+                            <p>
+                                <label class="radio-inline">
+                                    <input  class="option" type="radio" name="judgeAnswer" id="judgeAnswer1" value="1" @change="isAnswer">
+                                    对
+                                </label>
+                            </p>
+                            <p>
+                                <label class="radio-inline">
+                                    <input  class="option" type="radio" name="judgeAnswer" id="judgeAnswer2" value="2" @change="isAnswer" >
+                                    错
+                                </label>
+                            </p>
+                        </template>
+                    </div>
+                    <p class="col-lg-offset-9">
+                    <button type="button" class="btn btn-default" v-show="!pageInfo.isFirstPage" @click="pre">上一题</button>
+                    <button type="button" class="btn btn-default" @click="next" v-show="!pageInfo.isLastPage">下一题</button>
+                    <button type="button" class="btn btn-default" @click="submitExam">交卷</button>
+                    </p>
+                </div>
+            </div><!--/row-->
+        </div><!--/.col-xs-12.col-sm-9-->
+
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+            <div class="list-group">
+                <p class="list-group-item" th:text="'考生：【'+${session.user.stuName}+'】'"></p>
+                <p class="list-group-item">
+                    剩余考试时间:
+                    {{hour? hourString+':'+minuteString+':'+secondString : minuteString+':'+secondString}}
+                </p>
+            </div>
+            <div class="list-group">
+                <p class="list-group-item">
+                    <template v-for="(que,index) in pageInfo.total">
+                        <button type="button" class="btn btn-default" @click="getPageInfo(index+1)">{{index+1}}</button>
+                    </template>
+                </p>
+
+                <p class="list-group-item">
+                    <span class="label label-primary">当前第{{pageInfo.pageNum}}题</span>
+                    <span class="label label-success">共{{pageInfo.pages}}题</span>
+                </p>
+
+            </div>
+        </div><!--/.sidebar-offcanvas-->
+    </div><!--/row-->
+
+    <hr>
+
+    <footer>
+        <p>© 2022 Zjipc, @DONGDONG</p>
+    </footer>
+
+</div><!--/.container-->
+<script th:src="@{/js/student/exam_paper.js}"></script>
+<script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/jquery.hDialog.js}"></script>
+<script th:src="@{/js/jquery-confirm.min.js}"></script>
+
+</body>
+</html>

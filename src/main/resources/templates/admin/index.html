@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Quick Test 后台管理</title>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Quick Test</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" th:text="${session.user.username}"></a></li>
+                <li><a th:href="@{/userLogout}">注销</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!--侧边栏 start-->
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li  class="active"><a th:href="@{/admin}">HOME<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/studentManage}">学生信息管理 <span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/teacherManage}">教师信息管理</a></li>
+                <li><a th:href="@{/admin/majorManage}">专业信息管理</a></li>
+                <li ><a th:href="@{/admin/adminManage}">管理员</a></li>
+            </ul>
+
+            <ul class="nav nav-sidebar">
+                <li  class="active"><a>试卷/题库<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/paperManage}">试卷管理<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/questionManage}">试题管理</a></li>
+            </ul>
+        </div>
+        <!--侧边栏 start-->
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h2 class="sub-header">Quick Test 在线考试后台管理系统</h2>
+
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html >
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Quick Test 用户登录</title>
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet">
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+    <script th:src="@{/js/vue.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+    <link th:href="@{/css/cover.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/animate.min.css}"/> <!-- 动画效果 -->
+
+
+</head>
+
+<body>
+
+<div class="site-wrapper">
+
+    <div class="site-wrapper-inner">
+
+        <div class="cover-container">
+
+            <div class="masthead clearfix">
+                <div class="inner">
+                    <h3 class="masthead-brand">Online-Exam</h3>
+                    <nav>
+                        <ul th:if="${session.user == null}" class="nav masthead-nav">
+                            <li class="active"><a href="#">Home</a></li>
+                            <li id="stu_btn">
+                                <p class="stu-login-msg" th:text="${session.stuLoginMsg}"></p>
+                                <a class="nav-stu-login" href="#">学生登录</a>
+                            </li>
+                            <!--学生登录模态框 start-->
+                            <div class="modal fade" id="stu_modal" tabindex="-1" role="dialog"
+                                 aria-labelledby="stuModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close"><span aria-hidden="true">&times;</span>
+                                            </button>
+                                            <h4 class="modal-title" id="stuModalLabel">学生登录</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="form-horizontal col-lg-offset-2">
+                                                <div class="form-group ">
+                                                    <div class="col-sm-10">
+                                                        <strong class="login_msg">{{login_msg}}</strong>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="inputEmail2" class="col-sm-2 control-label">学号</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control" id="inputEmail2"
+                                                               v-model="id" placeholder="Student Number">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="inputPassword2"
+                                                           class="col-sm-2 control-label">密码</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="password" class="form-control"
+                                                               @keyup.enter="stuLogin" id="inputPassword2"
+                                                               v-model="stu_password" placeholder="Password">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="col-xs-4  col-lg-offset-3">
+                                                        <button type="button" class="btn btn-success btn-block"
+                                                                @click="stuLogin">登录
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--学生登录模态框 end-->
+                            <li id="btn" data-toggle="modal">
+                                <p class="tea-login-msg" th:text="${session.teaLoginMsg}"></p>
+                                <a href="#">教师登录</a>
+                            </li>
+                            <!--教师登录模态框 start-->
+                            <div class="modal fade" id="teach_modal" tabindex="-1" role="dialog"
+                                 aria-labelledby="myModalLabel">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal"
+                                                    aria-label="Close"><span aria-hidden="true">&times;</span>
+                                            </button>
+                                            <h4 class="modal-title" id="myModalLabel">教师登录</h4>
+                                        </div>
+                                        <div class="modal-body">
+                                            <form class="form-horizontal col-lg-offset-2" th:action="@{/teacher/login}"
+                                                  method="post">
+                                                <div class="form-group ">
+                                                    <div class="col-sm-10">
+                                                        <strong class="login_msg">{{login_msg}}</strong>
+                                                    </div>
+
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="inputEmail3" class="col-sm-2 control-label">工号</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="text" class="form-control" id="inputEmail3"
+                                                               v-model="id" placeholder="work number">
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="inputPassword3"
+                                                           class="col-sm-2 control-label">密码</label>
+                                                    <div class="col-sm-6">
+                                                        <input type="password" class="form-control"
+                                                               @keyup.enter="teaLogin" id="inputPassword3"
+                                                               v-model="tea_password" placeholder="Password">
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <div class="col-xs-4  col-lg-offset-3">
+                                                        <button type="button" class="btn btn-success btn-block"
+                                                                @click="teaLogin">登录
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default" data-dismiss="modal">
+                                                取消
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--教师登录模态框 end-->
+                            <script type="text/javascript">
+                                var teach = new Vue({
+                                    el: '#teach_modal',
+                                    data: {
+                                        id: '',
+                                        tea_password: '',
+                                        login_msg: ''
+                                    },
+                                    methods: {
+                                        //教师登录函数
+                                        teaLogin: function () {
+                                            //发送ajax请求至后台接口
+                                            axios.post('teacher/login' +
+                                                '?id=' + this.id +
+                                                '&teaPassword=' + this.tea_password).then((response) => {
+                                                //工号密码验证成功重定向至教师主页
+                                                if (response.data.success) {
+                                                    location.href = response.data.message + '/teacher'
+                                                    return;
+                                                }
+                                                this.login_msg = '用户名或密码错误！'
+                                            });
+                                        }
+                                    }
+                                })
+                            </script>
+                            <script type="text/javascript">
+                                var stu = new Vue({
+                                    el: '#stu_modal',
+                                    data: {
+                                        id: '',
+                                        stu_password: '',
+                                        login_msg: ''
+                                    },
+                                    methods: {
+                                        //stu登录函数
+                                        stuLogin: function () {
+                                            //发送ajax请求至后台接口
+                                            axios.post('student/login' +
+                                                '?id=' + this.id +
+                                                '&stuPassword=' + this.stu_password).then((response) => {
+                                                //学号密码验证成功重定向至学生主页
+                                                if (response.data.success) {
+                                                    location.href = response.data.message + '/student'
+                                                    return;
+                                                }
+                                                this.login_msg = '用户名或密码错误！'
+                                            });
+                                        }
+                                    }
+                                })
+                            </script>
+                        </ul>
+                        <ul th:if="${session.user != null}" class="nav masthead-nav">
+                            <li class="active"><a href="#">Home</a></li>
+                            <li th:if="${session.user.role == '2'}">
+                                <a href="#" th:text="${session.user.teaName}+'老师,你好！'"></a>
+                            </li>
+                            <li th:if="${session.user.role == '1'}">
+                                <a href="#" th:text="${session.user.stuName}+'同学，你好！'"></a>
+                            </li>
+                            <li th:if="${session.user.role == '3'}">
+                                <a href="#" >管理员，你好</a>
+                            </li>
+                            <li>
+                                <a href="#" th:href="@{/userLogout}">注销</a>
+                            </li>
+                        </ul>
+
+                        <script>
+                            $('#btn').click(function () {
+                                $('#teach_modal').modal()
+                            })
+
+                            $('#stu_btn').click(function () {
+                                $('#stu_modal').modal()
+                            })
+                        </script>
+                    </nav>
+                </div>
+
+            </div>
+
+            <div class="inner cover">
+                <h1 class="cover-heading">QUICK TEST</h1>
+                <p class="lead">更方便，更快，更全面的在线考试管理系统</p>
+                <p class="lead">
+                        <a th:if="${session.user != null && session.user.role == '1'}" th:href="@{/student}"
+                           class="btn btn-lg btn-default">我的主页</a>
+                        <a th:if="${session.user != null && session.user.role == '2'}" th:href="@{/teacher}"
+                           class="btn btn-lg btn-default">我的主页</a>
+                        <a th:if="${session.user != null && session.user.role == '3'}" th:href="@{/admin}"
+                           class="btn btn-lg btn-default">我的主页</a>
+                </p>
+            </div>
+
+            <div class="mastfoot">
+                <div class="inner">
+                    <p>© 2022 zjipc, @DONGDONG</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script th:src="@{/js/jquery.hDialog.js}"></script>
+
+</body>
+</html>

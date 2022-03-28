@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Quick Test 后台管理</title>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <script th:src="@{/js/vue.min.js}"></script>
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/animate.min.css}"/> <!-- 动画效果 -->
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Quick Test</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" th:text="${session.user.username}"></a></li>
+                <li><a th:href="@{/userLogout}">注销</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!--侧边栏 start-->
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li  class="active"><a th:href="@{/admin}">HOME<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/studentManage}">学生信息管理 <span class="sr-only">(current)</span></a></li>
+                <li><a class="nav_select" th:href="@{/admin/teacherManage}">教师信息管理</a></li>
+                <li><a th:href="@{/admin/majorManage}">专业信息管理</a></li>
+                <li ><a th:href="@{/admin/adminManage}">管理员</a></li>
+            </ul>
+
+            <ul class="nav nav-sidebar">
+                <li  class="active"><a>试卷/题库<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/paperManage}">试卷管理<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/questionManage}">试题管理</a></li>
+            </ul>
+        </div>
+        <!--侧边栏 start-->
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id="teacher_list_table">
+            <h2 class="sub-header">教师列表</h2>
+            <!--添加删除按钮 start-->
+            <div class="row">
+                <div class="col-md-2 col-md-offset-10">
+                    <button type="button" id="teacher_add_btn" class="btn btn-success" @click="add">添加</button>
+                    <!-- 添加教师模态框 start-->
+                    <div class="modal fade" id="teacher_add_model" tabindex="-1" role="dialog"
+                         aria-labelledby="teacherModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="teacherModalLabel">添加教师</h4>
+                                </div>
+                                <!--  输入框 start-->
+                                <div class="modal-body">
+                                    <form class="form-horizontal">
+                                        <div class="form-group"
+                                             :class="{'has-error' : newTeaNameHasError}">
+                                            <label for="addInputName1" class="col-sm-2 control-label">教师姓名</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="AddInputName1"
+                                                       placeholder="teacher name" name="teaName"
+                                                       ref="newTeaNameRef"
+                                                       v-model="newTeacherInfo.teaName">
+                                                <span id="helpBlock1" class="help-block">
+                                                    {{newTeaNameErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group"
+                                             :class="{'has-error' : newPasswordHasError}">
+                                            <label for="addInputName2" class="col-sm-2 control-label">登录密码</label>
+                                            <div class="col-sm-10">
+                                                <input type="password" class="form-control" id="AddInputName2"
+                                                       placeholder="password" name="teaPassword"
+                                                       ref="newPasswordRef"
+                                                       v-model="newTeacherInfo.teaPassword">
+                                                <span id="helpBlock2" class="help-block">
+                                                    {{newPasswordErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group"
+                                             :class="{'has-error' : newTeaTelHasError}">
+                                            <label for="addInputName3" class="col-sm-2 control-label">教师电话</label>
+                                            <div class="col-sm-10">
+                                                <input type="tel" class="form-control" id="AddInputName3"
+                                                       placeholder="telephone" name="teaTel"
+                                                       ref="newTeaTelRef"
+                                                       v-model="newTeacherInfo.teaTel">
+                                                <span id="helpBlock3" class="help-block">
+                                                    {{newTeaTelErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group"
+                                             :class="{'has-error' : newTeaMajorHasError}">
+                                            <label class="col-sm-2 control-label">所在专业</label>
+                                            <div class="col-sm-4">
+                                                <select class="form-control" v-model="newTeacherInfo.teaMajor"
+                                                        ref="newTeaMajorRef">
+                                                    <option :value="major.majName" v-for="major in majorList">
+                                                        {{major.majName}}
+                                                    </option>
+                                                </select>
+                                                <span id="helpBlock4" class="help-block">
+                                                    {{newTeaMajorErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!--  输入框 end-->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default"
+                                           @click="closeAddModal">关闭
+                                    </button>
+                                    <button type="button" class="btn btn-primary" @click="addTeacher">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 添加教师模态框 end-->
+                    <button type="button" class="btn btn-danger">删除</button>
+                </div>
+            </div>
+            <!--添加删除按钮 end-->
+
+            <!--教师列表 start-->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>教师工号</th>
+                        <th>教师姓名</th>
+                        <th>所在专业</th>
+                        <th>密码</th>
+                        <th>教师电话</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="teacher in pageInfo.list" >
+                        <td>{{teacher.id}}</td>
+                        <td>{{teacher.teaName}}</td>
+                        <td>{{teacher.teaMajor}}</td>
+                        <td>{{teacher.teaPassword}}</td>
+                        <td>{{teacher.teaTel}}</td>
+                        <td>
+                            <button type="button" id="teacher_update_btn" class="btn btn-warning"
+                                   @click="update(teacher.id)">修改
+                            </button>
+                            <button type="button" id="teacher_del_btn" class="btn btn-danger"
+                                    @click="del(teacher.id)">删除
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- 修改教师信息模态框 start-->
+            <div class="modal fade" id="teacher_update_model" tabindex="-1" role="dialog"
+                 aria-labelledby="updateModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="updateModalLabel">修改教师信息</h4>
+                        </div>
+                        <!--  输入框 start-->
+                        <div class="modal-body">
+                            <form class="form-horizontal">
+                                <div class="form-group"
+                                     :class="{'has-error' : updateTeaNameHasError}">
+                                    <label for="updateInputName1" class="col-sm-2 control-label">教师姓名</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="updateInputName1"
+                                               placeholder="teacher name" name="teaName"
+                                               ref="updateTeaNameRef"
+                                               v-model="updateTeacherInfo.teaName">
+                                        <span id="helpBlock1-update" class="help-block">
+                                             {{updateTeaNameErrorMsg}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group"
+                                     :class="{'has-error' : updatePasswordHasError}">
+                                    <label for="updateInputName2" class="col-sm-2 control-label">登录密码</label>
+                                    <div class="col-sm-10">
+                                        <input type="password" class="form-control" id="updateInputName2"
+                                               placeholder="password" name="teaPassword"
+                                               ref="updatePasswordRef"
+                                               v-model="updateTeacherInfo.teaPassword">
+                                        <span id="helpBlock2-update" class="help-block">
+                                             {{updatePasswordErrorMsg}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group"
+                                     :class="{'has-error' : updateTeaTelHasError}">
+                                    <label for="updateInputName3" class="col-sm-2 control-label">教师电话</label>
+                                    <div class="col-sm-10">
+                                        <input type="tel" class="form-control" id="updateInputName3"
+                                               placeholder="telephone" name="teaTel"
+                                               ref="updateTeaTelRef"
+                                               v-model="updateTeacherInfo.teaTel">
+                                        <span id="helpBlock3-update" class="help-block">
+                                             {{updateTeaTelErrorMsg}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">所在专业</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" v-model="updateTeacherInfo.teaMajor">选择
+                                            <option :value="major.majName" v-for="major in majorList">
+                                                {{major.majName}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!--  输入框 end-->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                   @click="closeUpdateModal">关闭
+                            </button>
+                            <button type="button" class="btn btn-primary" @click="updateTeacher" >保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 修改管理员模态框 end-->
+            <!--教师列表 end-->
+
+            <!--分页导航 start-->
+            <div th:include="common/common :: #navigation"></div>
+            <!--分页导航 end-->
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/admin/teacher_manage.js}"></script>
+<script th:src="@{/js/jquery.hDialog.js}"></script>
+</body>
+</html>

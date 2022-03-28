@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zjipc.yd.online_exam.mapper.MajorMapper">
+    <insert id="addMajor">
+        insert into tb_major(`maj_name`) values (#{majName})
+    </insert>
+    <update id="updateMajor">
+        update tb_major set `maj_name` = #{majName} where id = #{id}
+    </update>
+    <delete id="deleteMajor">
+        delete from tb_major where id = #{id}
+    </delete>
+
+    <select id="getMajorList" resultType="cn.zjipc.yd.online_exam.bean.Major">
+        select * from tb_major
+    </select>
+    <select id="getMajorById" resultType="cn.zjipc.yd.online_exam.bean.Major">
+        select * from tb_major where id = #{id}
+    </select>
+    <select id="getMajorByMajName" resultType="cn.zjipc.yd.online_exam.bean.Major">
+        select * from tb_major where upper(`maj_name`) = upper(#{majName})
+    </select>
+</mapper>

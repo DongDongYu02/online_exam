@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+    <title>Quick Test 教师</title>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <script th:src="@{/js/vue.min.js}"></script>
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="https://v3.bootcss.com/examples/dashboard/#">Quick Test</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" th:text="${session.user.getTeaName()}"></a></li>
+                <li><a th:href="@{/userLogout}">注销</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!--侧边栏 start-->
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li class="active"><a th:href="@{/teacher}">HOME<span class="sr-only">(current)</span></a></li>
+                <li class="nav_select"><a th:href="@{/teacher/studentInfo}">我的学生 <span class="sr-only">(current)</span></a>
+                </li>
+                <li><a th:href="@{/teacher/myPaperManage}">我的专业试题管理</a></li>
+            </ul>
+
+        </div>
+        <!--侧边栏 start-->
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <h2 class="sub-header">我的学生列表</h2>
+            <!--学生列表 start-->
+            <div class="table-responsive" id="student_list_table">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>学生学号</th>
+                        <th>学生姓名</th>
+                        <th>所在专业</th>
+                        <th>学生电话</th>
+                        <th>查看</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="student in pageInfo.list">
+                        <td>{{student.id}}</td>
+                        <td>{{student.stuName}}</td>
+                        <td>{{student.stuMajor}}</td>
+                        <td>{{student.stuTel}}</td>
+                        <td>
+                            <button type="button" id="student_update_btn" class="btn btn-warning"
+                                    @click="checkResult(student.id,student.stuName)">历史成绩
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <!--分页导航 start-->
+                <div class="col-md-4">
+                    <span class="label label-primary">第{{pageInfo.pageNum}}页</span>
+                    <span class="label label-success">共{{pageInfo.pages}}页</span>
+                    <span class="label label-info">共{{pageInfo.total}}个学生</span>
+                </div>
+                <nav aria-label="Page navigation " class="col-lg-offset-9">
+                    <ul class="pagination">
+                        <li :class="{disabled:pageInfo.isFirstPage}">
+                            <a @click="getPageInfo(1)">首页</a>
+                        </li>
+                        <li v-show="!pageInfo.isFirstPage">
+                            <a aria-label="Previous" @click="getPageInfo(pageInfo.prePage)">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        <li v-for="page in pageInfo.navigatepageNums" :class="{active:page == pageInfo.pageNum}">
+                            <a @click="getPageInfo(page)">{{page}}</a>
+                        </li>
+                        <li v-show="!pageInfo.isLastPage">
+                            <a aria-label="Next" @click="getPageInfo(pageInfo.nextPage)">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        <li :class="{disabled:pageInfo.isLastPage}">
+                            <a @click="getPageInfo(pageInfo.pages)">末页</a>
+                        </li>
+                    </ul>
+                </nav>
+                <!--分页导航 end-->
+                <!-- 学生成绩模态框 start-->
+                <div class="modal fade" id="student_result_model" tabindex="-1" role="dialog"
+                     aria-labelledby="resultModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"
+                                        aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="resultModalLabel">{{stuName}}的考试成绩</h4>
+                            </div>
+                            <!--  成绩列表 start-->
+                            <div class="modal-body">
+                                <div class="table-responsive" id="result_list">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                        <tr>
+                                            <th>考试名称</th>
+                                            <th>考试成绩</th>
+                                            <th>交卷时间</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr v-show="studentResult != [] " v-for="result in studentResult">
+                                            <td>{{result.papName}}</td>
+                                            <td>{{result.score}}</td>
+                                            <td>{{result.createTime}}</td>
+                                        </tr>
+                                            <p v-show="studentResult == ''">该学生没有任何考试成绩</p>
+
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                            <!--  成绩列表 end-->
+
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default"
+                                        data-dismiss="modal">关闭
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 学生成绩模态框 end-->
+            </div>
+            <!--学生列表 end-->
+
+
+        </div>
+        <script th:src="@{/js/teacher/my_students.js}"></script>
+    </div>
+</div>
+</body>
+</html>

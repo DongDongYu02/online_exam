@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zjipc.yd.online_exam.mapper.AdminMapper">
+
+    <insert id="addAdmin" parameterType="cn.zjipc.yd.online_exam.bean.Admin" useGeneratedKeys="true" keyProperty="id">
+        insert into tb_admin(`username`,`password`) values (#{username},#{password})
+    </insert>
+    <update id="updateAdmin" parameterType="cn.zjipc.yd.online_exam.bean.Admin">
+       update tb_admin
+        <trim prefix="set" suffixOverrides=",">
+            <if test="username != null">
+                `username` = #{username},
+            </if>
+            <if test="password != null">
+                `password` = #{password}
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="deleteAdminById" parameterType="cn.zjipc.yd.online_exam.bean.Admin">
+        delete from tb_admin where id = #{id}
+    </delete>
+    <select id="getAdminByUsernameAndPassword" resultType="cn.zjipc.yd.online_exam.bean.Admin">
+        select * from tb_admin where `username` = #{username} and `password` = #{password}
+    </select>
+    <select id="getAdminByUsername" resultType="cn.zjipc.yd.online_exam.bean.Admin">
+        select * from tb_admin where upper(`username`) = upper(#{username})
+    </select>
+    <select id="getAdminList" resultType="cn.zjipc.yd.online_exam.bean.Admin">
+        select * from tb_admin
+    </select>
+    <select id="getAdminById" resultType="cn.zjipc.yd.online_exam.bean.Admin">
+        select * from tb_admin where `id` = #{id}
+    </select>
+</mapper>

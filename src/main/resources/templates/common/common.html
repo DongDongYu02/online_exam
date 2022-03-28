@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <!--分页导航 start-->
+    <div id="navigation">
+        <div class="col-md-4">
+            <span class="label label-primary">第{{pageInfo.pageNum}}页</span>
+            <span class="label label-success">共{{pageInfo.pages}}页</span>
+            <span class="label label-info">共{{pageInfo.total}}条记录</span>
+        </div>
+        <nav aria-label="Page navigation " class="col-lg-offset-9">
+            <ul class="pagination">
+                <li :class="{disabled:pageInfo.isFirstPage}">
+                    <a @click="getPageInfo(1)">首页</a>
+                </li>
+                <li v-show="!pageInfo.isFirstPage">
+                    <a aria-label="Previous" @click="getPageInfo(pageInfo.prePage)">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li v-for="page in pageInfo.navigatepageNums" :class="{active:page == pageInfo.pageNum}">
+                    <a @click="getPageInfo(page)">{{page}}</a>
+                </li>
+                <li v-show="!pageInfo.isLastPage">
+                    <a aria-label="Next" @click="getPageInfo(pageInfo.nextPage)">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+                <li :class="{disabled:pageInfo.isLastPage}">
+                    <a @click="getPageInfo(pageInfo.pages)">末页</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    <!--分页导航 end-->
+</body>
+</html>

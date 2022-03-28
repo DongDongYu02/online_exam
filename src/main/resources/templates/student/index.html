@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Quick Test 学生</title>
+    <script th:src="@{/js/axios.min.js}"></script>
+    <script th:src="@{/js/vue.min.js}"></script>
+
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/offcanvas.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/animate.min.css}"/> <!-- 动画效果 -->
+    <link rel="stylesheet" th:href="@{/css/jquery-confirm.min.css}"/>
+
+</head>
+<body>
+<nav class="navbar navbar-fixed-top navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Quick Test</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Home</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" th:text="${session.user.stuName}"></a></li>
+                <li><a th:href="@{/userLogout}">注销</a></li>
+            </ul>
+        </div><!-- /.nav-collapse -->
+    </div><!-- /.container -->
+</nav><!-- /.navbar -->
+
+<div class="container">
+
+    <div class="row row-offcanvas row-offcanvas-right">
+
+        <div class="col-xs-12 col-sm-9">
+            <p class="pull-right visible-xs">
+                <button type="button" class="btn btn-primary btn-xs" data-toggle="offcanvas">Toggle nav</button>
+            </p>
+            <div class="jumbotron">
+                <h2 th:text="${session.user.stuName}+',同学你好！'"></h2>
+                <p>请在规定日期时间内完成你的考试，不然挂科了可不好！</p>
+            </div>
+            <div class="row" id="student_paper_list">
+                <div class="col-xs-6 col-lg-4"  v-for="paper in examList" @click="startExam(paper.papName,paper.startTime,paper.endTime)">
+                    <div class="panel panel-default" style="cursor: pointer" >
+                        <div class="panel-heading">{{paper.papName}}</div>
+                        <div class="panel-body">
+                            <p>{{paper.startTime}}</p>
+                            <p>{{paper.endTime}}</p>
+                            <p>考试时长:{{paper.examTime}}分钟
+                                <template v-if="nowTime - Date.parse(paper.startTime) > 0 && nowTime - Date.parse(paper.endTime) < 0">
+                                    <span class="label label-success" >已开始</span>
+                                </template>
+                                <template v-if="nowTime - Date.parse(paper.startTime) < 0">
+                                    <span class="label label-default" >未开始</span>
+                                </template>
+                                <template v-if="nowTime - Date.parse(paper.endTime) > 0">
+                                    <span class="label label-danger" >已结束</span>
+                                </template>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p v-if="examList == ''">你当前没有任何考试</p><!--/.col-xs-6.col-lg-4-->
+            </div><!--/row-->
+        </div><!--/.col-xs-12.col-sm-9-->
+
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
+            <div class="list-group">
+                <a th:href="@{/student}" class="list-group-item active">我的考试</a>
+                <a th:href="@{/student/myResultsPage}" class="list-group-item">我的历史考试成绩</a>
+            </div>
+        </div><!--/.sidebar-offcanvas-->
+    </div><!--/row-->
+
+    <hr>
+
+    <footer>
+        <p>© 2022 Zjipc, @DONGDONG</p>
+    </footer>
+
+</div><!--/.container-->
+
+<script th:src="@{/js/student/student_index.js}"></script>
+<script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/jquery.hDialog.js}"></script>
+<script th:src="@{/js/jquery-confirm.min.js}"></script>
+
+</body>
+</html>

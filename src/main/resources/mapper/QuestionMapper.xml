@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zjipc.yd.online_exam.mapper.QuestionMapper">
+    <insert id="addQuestion">
+        insert into tb_question(`que_name`, `que_type`, `que_option1`, `que_option2`, `que_option3`, `que_option4`,
+                                `que_answer`, `que_paper`)
+        values (#{queName}, #{queType}, #{queOption1}, #{queOption2}, #{queOption3}, #{queOption4}, #{queAnswer},
+                #{quePaper})
+    </insert>
+    <update id="updateQuestion">
+        update tb_question
+        <trim prefix="set" suffixOverrides=",">
+            <if test="queName != null">
+                `que_name` = #{queName},
+            </if>
+            <if test="queType != null">
+                `que_type` = #{queType},
+            </if>
+            <if test="queOption1 != null">
+                `que_option1` = #{queOption1},
+            </if>
+            <if test="queOption2 != null ">
+                `que_option2` = #{queOption2},
+            </if>
+            <if test="queOption3 != null">
+                `que_option3` = #{queOption3},
+            </if>
+            <if test="queOption4 != null">
+                `que_option4` = #{queOption4},
+            </if>
+            <if test="queAnswer != null">
+                `que_answer` = #{queAnswer},
+            </if>
+            <if test="quePaper != null">
+                `que_paper` = #{quePaper}
+            </if>
+        </trim>
+        where id= #{id}
+    </update>
+    <update id="updateQuePaper">
+        update tb_question
+        set `que_paper` = #{arg1}
+        where `que_paper` = #{arg0}
+    </update>
+    <delete id="deleteQuestion">
+        delete
+        from tb_question
+        where id = #{id}
+    </delete>
+
+    <select id="getAllQuestion" resultType="cn.zjipc.yd.online_exam.bean.Question">
+        select *
+        from tb_question
+    </select>
+    <select id="getSingleQuestionListByPapName" resultType="cn.zjipc.yd.online_exam.bean.Question">
+        select *
+        from tb_question
+        where `que_paper` = #{papName}
+          and `que_type` = 1
+    </select>
+    <select id="getMultiQuestionListByPapName" resultType="cn.zjipc.yd.online_exam.bean.Question">
+        select *
+        from tb_question
+        where `que_paper` = #{papName}
+          and `que_type` = 2
+    </select>
+    <select id="getJudgeQuestionListByPapName" resultType="cn.zjipc.yd.online_exam.bean.Question">
+        select *
+        from tb_question
+        where `que_paper` = #{papName}
+          and `que_type` = 3
+
+    </select>
+    <select id="getQuestionById" resultType="cn.zjipc.yd.online_exam.bean.Question">
+        select *
+        from tb_question
+        where id = #{id}
+    </select>
+    <select id="getQuestionByPaperName" resultType="cn.zjipc.yd.online_exam.bean.Question">
+        select *
+        from tb_question
+        where `que_paper` = #{papName}
+        order by `que_type`
+    </select>
+    <select id="getPaperAnswerByPaperName" resultType="cn.zjipc.yd.online_exam.bean.SubmitAnswer">
+        select `id` questionId, `que_type` questionType, `que_answer` answer
+        from tb_question
+        where `que_paper` = #{papName}
+        order by `que_type`
+    </select>
+    <select id="getQuestionByQueName" resultType="cn.zjipc.yd.online_exam.bean.Question">
+        select * from tb_question where upper(que_name) = upper(#{queName})
+    </select>
+</mapper>

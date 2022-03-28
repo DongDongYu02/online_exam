@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Quick Test 后台管理</title>
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/bootstrap.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <script th:src="@{/js/vue.min.js}"></script>
+    <link th:href="@{/css/admin.css}" rel="stylesheet">
+    <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/animate.min.css}"/> <!-- 动画效果 -->
+</head>
+
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Quick Test</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#" th:text="${session.user.username}"></a></li>
+                <li><a th:href="@{/userLogout}">注销</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container-fluid">
+    <div class="row">
+        <!--侧边栏 start-->
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li class="active"><a th:href="@{/admin}">HOME<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/studentManage}">学生信息管理 <span
+                        class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/teacherManage}">教师信息管理</a></li>
+                <li><a th:href="@{/admin/majorManage}">专业信息管理</a></li>
+                <li><a th:href="@{/admin/adminManage}">管理员</a></li>
+            </ul>
+
+            <ul class="nav nav-sidebar">
+                <li class="active"><a>试卷/题库<span class="sr-only">(current)</span></a></li>
+                <li><a th:href="@{/admin/paperManage}">试卷管理<span class="sr-only">(current)</span></a></li>
+                <li><a class="nav_select" th:href="@{/admin/questionManage}">试题管理</a></li>
+            </ul>
+        </div>
+        <!--侧边栏 start-->
+
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id="question_list_table">
+            <h2 class="sub-header">题目列表</h2>
+            <!--添加删除按钮 start-->
+            <div class="row">
+                <div class="col-md-2 col-md-offset-10">
+                    <button type="button" id="question_add_btn" class="btn btn-success" @click="add">添加</button>
+                    <!-- 添加题目模态框 start-->
+                    <div class="modal fade" id="question_add_model" tabindex="-1" role="dialog"
+                         aria-labelledby="questionModalLabel">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h4 class="modal-title" id="questionModalLabel">添加题目</h4>
+                                </div>
+                                <!--  输入框 start-->
+                                <div class="modal-body">
+                                    <form class="form-horizontal">
+                                        <div class="form-group"
+                                             :class="{'has-error' : newQueNameHasError}">
+                                            <label for="textArea" class="col-sm-2 control-label">题目</label>
+                                            <div class="col-sm-10">
+                                                <textarea class="form-control" id="textArea" rows="3"
+                                                          v-model="newQuestionInfo.queName"
+                                                          ref="newQueNameRef">
+                                                </textarea>
+                                                <span id="helpBlock1" class="help-block">
+                                                    {{newQueNameErrorMsg}}
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                        <div class="form-group"
+                                             :class="{'has-error' : newQueTypeHasError}">
+                                            <label class="col-sm-2 control-label">题目类型</label>
+                                            <div class=" col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio1"
+                                                           v-model="newQuestionInfo.queType"
+                                                           ref="newQueType1Ref"
+                                                           value="1"> 单选
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio2"
+                                                           ref="newQueType2Ref"
+                                                           v-model="newQuestionInfo.queType" value="2"> 多选
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="inlineRadioOptions" id="inlineRadio3"
+                                                           ref="newQueType3Ref"
+                                                           v-model="newQuestionInfo.queType" value="3"> 判断
+                                                </label>
+                                                <span id="helpBlock2" class="help-block">
+                                                    {{newQueTypeErrorMsg}}
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                        <!--当题目类型是 单选或者多选时 显示选项输入框 start-->
+                                        <div class="form-group"
+                                             :class="{'has-error' : newQueOptionHasError}"
+                                             v-show="newQuestionInfo.queType == 1 || newQuestionInfo.queType == 2">
+                                            <label for="questionOption1" class="col-sm-2 control-label">选项A</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="questionOption1"
+                                                       v-model="newQuestionInfo.queOption1"
+                                                       ref="newQueOption1Ref"
+                                                       placeholder="选项A">
+                                            </div>
+                                            <label for="questionOption2" class="col-sm-2 control-label">选项B</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="questionOption2"
+                                                       v-model="newQuestionInfo.queOption2"
+                                                       ref="newQueOption2Ref"
+                                                       placeholder="选项B">
+                                            </div>
+                                            <label for="questionOption3" class="col-sm-2 control-label">选项C</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="questionOption3"
+                                                       v-model="newQuestionInfo.queOption3"
+                                                       ref="newQueOption3Ref"
+                                                       placeholder="选项C">
+                                            </div>
+                                            <label for="questionOption4" class="col-sm-2 control-label">选项D</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="questionOption4"
+                                                       v-model="newQuestionInfo.queOption4"
+                                                       ref="newQueOption4Ref"
+                                                       placeholder="选项D">
+                                                <span id="helpBlock3" class="help-block">
+                                                    {{newQueOptionErrorMsg}}
+                                                </span>
+                                            </div>
+
+                                        </div>
+                                        <!--当题目类型是 单选或者多选时 显示选项输入框 end-->
+
+                                        <!--当题目类型是单选题时 显示答案单选按钮 start-->
+                                        <div class="form-group"
+                                             :class="{'has-error' : newQueSingleAnswerHasError}"
+                                             v-show="newQuestionInfo.queType == 1">
+                                            <label class="col-sm-2 control-label">正确答案</label>
+                                            <div class="col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="singleAnswer" id="singleOption1"
+                                                           v-model="newQuestionInfo.queAnswer"
+                                                           ref="newQueSingleAnswerARef"
+                                                           value="A"> A
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="singleAnswer" id="singleOption2"
+                                                           v-model="newQuestionInfo.queAnswer"
+                                                           ref="newQueSingleAnswerBRef"
+                                                           value="B"> B
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="singleAnswer" id="singleOption3"
+                                                           v-model="newQuestionInfo.queAnswer"
+                                                           ref="newQueSingleAnswerCRef"
+                                                           value="C"> C
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="singleAnswer" id="singleOption4"
+                                                           v-model="newQuestionInfo.queAnswer"
+                                                           ref="newQueSingleAnswerDRef"
+                                                           value="D"> D
+                                                </label>
+                                                <span id="helpBlock4" class="help-block">
+                                                    {{newQueSingleAnswerErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <!--当题目类型是单选题时 显示答案单选按钮 end-->
+
+                                        <!--当题目类型是多选题时 显示答案多选按钮 start-->
+                                        <div class="form-group"
+                                             :class="{'has-error' : newQueMultiAnswerHasError}"
+                                             v-show="newQuestionInfo.queType == 2">
+                                            <label class="col-sm-2 control-label">正确答案</label>
+                                            <div class="col-sm-10">
+                                                <label class="checkbox-inline">
+                                                    <input type="checkbox" value="A"
+                                                           ref="newQueMultiAnswerARef"
+                                                           v-model="multiAnswer">A
+                                                </label>
+                                                <label class="checkbox-inline">
+                                                    <input type="checkbox" value="B"
+                                                           ref="newQueMultiAnswerBRef"
+                                                           v-model="multiAnswer">B
+                                                </label>
+                                                <label class="checkbox-inline">
+                                                    <input type="checkbox" v-model="multiAnswer"
+                                                           ref="newQueMultiAnswerCRef"
+                                                           value="C"> C
+                                                </label>
+                                                <label class="checkbox-inline">
+                                                    <input type="checkbox" value="D"
+                                                           ref="newQueMultiAnswerDRef"
+                                                           v-model="multiAnswer">D
+                                                </label>
+                                                <span id="helpBlock5" class="help-block">
+                                                    {{newQueMultiAnswerErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <!--当题目类型是单选题时 显示答案多选按钮 end-->
+
+                                        <!--当题目类型是判断题时 显示答案对错单选按钮 start-->
+                                        <div class="form-group"
+                                             :class="{'has-error' : newQueJudgeAnswerHasError}"
+                                             v-show="newQuestionInfo.queType == 3">
+                                            <input type="hidden" v-model="newQuestionInfo.queOption1" value="1">
+                                            <input type="hidden" v-model="newQuestionInfo.queOption2" value="2">
+                                            <label class="col-sm-2 control-label">答案</label>
+                                            <div class="col-sm-10">
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="judgeAnswer" id="judgeAnswer1"
+                                                           ref="newQueJudgeAnswer1Ref"
+                                                           v-model="newQuestionInfo.queAnswer" value="1"> 对
+                                                </label>
+                                                <label class="radio-inline">
+                                                    <input type="radio" name="judgeAnswer" id="judgeAnswer2"
+                                                           ref="newQueJudgeAnswer2Ref"
+                                                           v-model="newQuestionInfo.queAnswer" value="2"> 错
+                                                </label>
+                                                <span id="helpBlock6" class="help-block">
+                                                    {{newQueJudgeAnswerErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <!--当题目类型是判断题时 显示答案对错单选按钮 end-->
+
+                                        <div class="form-group"
+                                             :class="{'has-error' : newQuePaperHasError}">
+                                            <label class="col-sm-2 control-label">所属试卷</label>
+                                            <div class="col-sm-4">
+                                                <select class="form-control"
+                                                        ref="newQuePaperRef"
+                                                        v-model="newQuestionInfo.quePaper">
+                                                    <option :value="paper.papName" v-for="paper in paperList">
+                                                        {{paper.papName}}
+                                                    </option>
+                                                </select>
+                                                <span id="helpBlock7" class="help-block">
+                                                    {{newQuePaperErrorMsg}}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!--  输入框 end-->
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-default"
+                                            @click="closeAddModal">关闭
+                                    </button>
+                                    <button type="button" class="btn btn-primary" @click="addQuestion">保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 添加题目模态框 end-->
+                    <button type="button" class="btn btn-danger">删除</button>
+                </div>
+            </div>
+            <!--添加删除按钮 end-->
+
+            <!--题目列表 start-->
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>题目</th>
+                        <th>题目类型</th>
+                        <th>题目选项A</th>
+                        <th>题目选项B</th>
+                        <th>题目选项C</th>
+                        <th>题目选项D</th>
+                        <th>题目答案</th>
+                        <th>所属试卷</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="question in pageInfo.list">
+                        <td class="col-md-1">{{question.id}}</td>
+                        <td class="col-md-2">{{question.queName}}</td>
+                        <td class="col-md-1" v-show="question.queType == 1">单选题</td>
+                        <td class="col-md-1" v-show="question.queType == 2">多选题</td>
+                        <td class="col-md-1" v-show="question.queType == 3">判断题</td>
+                        <td class="col-md-1" v-show="question.queType == 3">对</td>
+                        <td class="col-md-1" v-show="question.queType != 3">{{question.queOption1}}</td>
+                        <td class="col-md-1" v-show="question.queType == 3">错</td>
+                        <td class="col-md-1" v-show="question.queType != 3">{{question.queOption2}}</td>
+                        <td class="col-md-1">{{question.queOption3}}</td>
+                        <td class="col-md-1">{{question.queOption4}}</td>
+                        <td>{{question.queAnswer}}</td>
+                        <td>{{question.quePaper}}</td>
+                        <td>
+                            <button type="button" id="question_update_btn" class="btn btn-warning"
+                                    @click="update(question.id)">修改
+                            </button>
+                            <button type="button" id="question_del_btn" class="btn btn-danger"
+                                    @click="del(question.id)">删除
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!--题目列表 end-->
+
+            <!-- 修改题目信息模态框 start-->
+            <div class="modal fade" id="question_update_model" tabindex="-1" role="dialog"
+                 aria-labelledby="updateModalLabel">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title" id="updateModalLabel">修改题目信息</h4>
+                        </div>
+                        <!--  输入框 start-->
+                        <div class="modal-body">
+                            <form class="form-horizontal">
+                                <div class="form-group"
+                                     :class="{'has-error' : updateQueNameHasError}">
+                                    <label for="textArea" class="col-sm-2 control-label">题目</label>
+                                    <div class="col-sm-10">
+                                                <textarea class="form-control" id="updateTextArea"
+                                                          rows="3"
+                                                          ref="updateQueNameRef"
+                                                          v-model="updateQuestionInfo.queName">
+                                                </textarea>
+                                        <span id="update-helpBlock1" class="help-block">
+                                            {{updateQueNameErrorMsg}}
+                                        </span>
+                                    </div>
+
+                                </div>
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">题目类型</label>
+                                    <div class="col-sm-10">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="inlineRadioOptions" id="updateInlineRadio1"
+                                                   v-model="updateQuestionInfo.queType"
+                                                   value="1"> 单选
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="inlineRadioOptions" id="updateInlineRadio2"
+                                                   v-model="updateQuestionInfo.queType"
+                                                   value="2"> 多选
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="inlineRadioOptions" id="updateInlineRadio3"
+                                                   v-model="updateQuestionInfo.queType"
+                                                   value="3"> 判断
+                                        </label>
+                                    </div>
+                                </div>
+                                <!--当题目类型是 单选或者多选时 显示选项输入框 start-->
+                                <div class="form-group"
+                                     :class="{'has-error' : updateQueOptionHasError}"
+                                     v-show="updateQuestionInfo.queType == 1 || updateQuestionInfo.queType == 2">
+                                    <label for="updateQuestionOption1" class="col-sm-2 control-label">选项A</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="updateQuestionOption1"
+                                               v-model="updateQuestionInfo.queOption1"
+                                               ref="updateQueOption1Ref"
+                                               placeholder="选项A">
+                                    </div>
+                                    <label for="updateQuestionOption2" class="col-sm-2 control-label">选项B</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="updateQuestionOption2"
+                                               v-model="updateQuestionInfo.queOption2"
+                                               ref="updateQueOption2Ref"
+                                               placeholder="选项B">
+                                    </div>
+                                    <label for="updateQuestionOption3" class="col-sm-2 control-label">选项C</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="updateQuestionOption3"
+                                               v-model="updateQuestionInfo.queOption3"
+                                               ref="updateQueOption3Ref"
+                                               placeholder="选项C">
+                                    </div>
+                                    <label for="updateQuestionOption4" class="col-sm-2 control-label">选项D</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="updateQuestionOption4"
+                                               v-model="updateQuestionInfo.queOption4"
+                                               ref="updateQueOption4Ref"
+                                               placeholder="选项D">
+                                        <span id="update-helpBlock3" class="help-block">
+                                            {{updateQueOptionErrorMsg}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <!--当题目类型是 单选或者多选时 显示选项输入框 end-->
+
+                                <!--当题目类型是单选题时 显示答案单选按钮 start-->
+                                <div class="form-group"
+                                     :class="{'has-error' : updateQueSingleAnswerHasError}"
+                                     v-show="updateQuestionInfo.queType == 1">
+                                    <label class="col-sm-2 control-label">正确答案</label>
+                                    <div class="col-sm-10">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="singleAnswer" id="updateSingleOption1"
+                                                   ref="updateQueSingleAnswerARef"
+                                                   v-model="updateQuestionInfo.queAnswer" value="A"> A
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="singleAnswer" id="updateSingleOption2"
+                                                   v-model="updateQuestionInfo.queAnswer"
+                                                   ref="updateQueSingleAnswerBRef"
+                                                   value="B"> B
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="singleAnswer" id="updateSingleOption3"
+                                                   v-model="updateQuestionInfo.queAnswer"
+                                                   ref="updateQueSingleAnswerCRef"
+                                                   value="C"> C
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="singleAnswer" id="updateSingleOption4"
+                                                   v-model="updateQuestionInfo.queAnswer"
+                                                   ref="updateQueSingleAnswerDRef"
+                                                   value="D"> D
+                                        </label>
+                                        <span id="update-helpBlock4" class="help-block">
+                                            {{updateQueSingleAnswerErrorMsg}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <!--当题目类型是单选题时 显示答案单选按钮 end-->
+
+                                <!--当题目类型是多选题时 显示答案多选按钮 start-->
+                                <div class="form-group"
+                                     :class="{'has-error' : updateQueMultiAnswerHasError}"
+                                     v-show="updateQuestionInfo.queType == 2">
+                                    <label class="col-sm-2 control-label">正确答案</label>
+                                    <div class="col-sm-10">
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="A"
+                                                   v-model="multiAnswer">A
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="B" v-model="multiAnswer">B
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" v-model="multiAnswer" value="C"> C
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" value="D" v-model="multiAnswer">D
+                                        </label>
+                                        <span id="update-helpBlock5" class="help-block">
+                                            {{updateQueMultiAnswerErrorMsg}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <!--当题目类型是多选题时 显示答案多选按钮 end-->
+
+                                <!--当题目类型是判断题时 显示答案对错单选按钮 start-->
+                                <div class="form-group"
+                                     :class="{'has-error' : updateQueJudgeAnswerHasError}"
+                                     v-show="updateQuestionInfo.queType == 3">
+                                    <label class="col-sm-2 control-label">答案</label>
+                                    <div class="col-sm-10">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="judgeAnswer" id="updateJudgeAnswer1"
+                                                   v-model="updateQuestionInfo.queAnswer"
+                                                   ref="updateQueJudgeAnswer1Ref"
+                                                   value="1"> 对
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="judgeAnswer" id="updateJudgeAnswer2"
+                                                   ref="updateQueJudgeAnswer2Ref"
+                                                   v-model="updateQuestionInfo.queAnswer" value="2"> 错
+                                        </label>
+                                        <span id="update-helpBlock6" class="help-block">
+                                            {{updateQueJudgeAnswerErrorMsg}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <!--当题目类型是判断题时 显示答案对错单选按钮 end-->
+
+                                <div class="form-group">
+                                    <label class="col-sm-2 control-label">所属试卷</label>
+                                    <div class="col-sm-4">
+                                        <select class="form-control" v-model="updateQuestionInfo.quePaper">
+                                            <option :value="paper.papName" v-for="paper in paperList">
+                                                {{paper.papName}}
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <!--  输入框 end-->
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default"
+                                    @click="closeUpdateModal">关闭
+                            </button>
+                            <button type="button" class="btn btn-primary" @click="updateQuestion">保存</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 修改题目模态框 end-->
+
+
+            <!--分页导航 start-->
+            <div th:include="common/common :: #navigation"></div>
+            <!--分页导航 end-->
+        </div>
+    </div>
+</div>
+<script th:src="@{/js/admin/question_manage.js}"></script>
+<script th:src="@{/js/jquery.hDialog.js}"></script>
+</body>
+</html>

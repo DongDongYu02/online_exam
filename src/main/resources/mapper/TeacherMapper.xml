@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.zjipc.yd.online_exam.mapper.TeacherMapper">
+    <insert id="addTeacher">
+        insert into tb_teacher(`tea_name`, `tea_password`, `tea_major`, `tea_tel`)
+        values (#{teaName}, #{teaPassword}, #{teaMajor}, #{teaTel})
+    </insert>
+    <update id="updateTeacher" parameterType="cn.zjipc.yd.online_exam.bean.Teacher">
+        update tb_teacher
+        <trim prefix="set" suffixOverrides=",">
+            <if test="teaName != null">
+                `tea_name` = #{teaName},
+            </if>
+            <if test="teaPassword != null">
+                `tea_password` = #{teaPassword},
+            </if>
+            <if test="teaMajor != null">
+                `tea_major` = #{teaMajor},
+            </if>
+            <if test="teaTel != null">
+                `tea_tel` = #{teaTel},
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+    <delete id="deleteTeacher">
+        delete from tb_teacher where id= #{id}
+    </delete>
+
+    <select id="getTeacherList" resultType="cn.zjipc.yd.online_exam.bean.Teacher">
+        select *
+        from tb_teacher
+    </select>
+    <select id="getTeacherById" resultType="cn.zjipc.yd.online_exam.bean.Teacher">
+        select *
+        from tb_teacher
+        where id = #{id}
+    </select>
+    <select id="getTeacherByIdAndPassword" resultType="cn.zjipc.yd.online_exam.bean.Teacher">
+        select * from tb_teacher where `id` = #{id} and `tea_password` = #{teaPassword}
+    </select>
+</mapper>
