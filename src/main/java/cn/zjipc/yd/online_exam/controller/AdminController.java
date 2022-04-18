@@ -480,15 +480,16 @@ public class AdminController {
 
     /**
      * 检查题目是否已存在
+     *
      * @param queName 题目名
      */
     @GetMapping("questionInfo/checkQueName")
     @ResponseBody
-    public AjaxMsg checkQueName(String queName){
-        if(adminService.checkQueName(queName) != null){
-            return new AjaxMsg(false,"题目已存在");
+    public AjaxMsg checkQueName(String queName) {
+        if (adminService.checkQueName(queName) != null) {
+            return new AjaxMsg(false, "题目已存在");
         }
-        return new AjaxMsg(true,"题目可用");
+        return new AjaxMsg(true, "题目可用");
     }
 
     /**
@@ -538,34 +539,53 @@ public class AdminController {
 
     /**
      * 统计系统教师人数接口
+     *
      * @return 教师人数
      */
     @GetMapping("/teacherCount")
     @ResponseBody
-    public AjaxMsg teacherCount(){
-       Long count = adminService.getTeacherCount();
-       return new AjaxMsg(true,"获取成功",count);
+    public AjaxMsg teacherCount() {
+        Long count = adminService.getTeacherCount();
+        return new AjaxMsg(true, "获取成功", count);
     }
 
+    /**
+     * 统计系统学生人数接口
+     * @Author Dong
+     * @Date 10:55 2022/4/18
+     * @return
+     **/
     @GetMapping("/studentCount")
     @ResponseBody
-    public AjaxMsg studentCount(){
+    public AjaxMsg studentCount() {
         Long count = adminService.getStudentCount();
-        return new AjaxMsg(true,"获取成功",count);
+        return new AjaxMsg(true, "获取成功", count);
     }
 
+    /**
+     * 统计试卷接口
+     * @Author Dong
+     * @Date 10:55 2022/4/18
+     * @return
+     **/
     @GetMapping("/paperCount")
     @ResponseBody
-    public AjaxMsg paperCount(){
+    public AjaxMsg paperCount() {
         Long count = adminService.getPaperCount();
-        return new AjaxMsg(true,"获取成功",count);
+        return new AjaxMsg(true, "获取成功", count);
     }
 
+   /**
+    * 统计题目数量接口
+    * @Author Dong
+    * @Date 10:56 2022/4/18
+    * @return
+    **/
     @GetMapping("/questionCount")
     @ResponseBody
-    public AjaxMsg questionCount(){
+    public AjaxMsg questionCount() {
         Long count = adminService.getQuestionCount();
-        return new AjaxMsg(true,"获取成功",count);
+        return new AjaxMsg(true, "获取成功", count);
     }
 }
 
