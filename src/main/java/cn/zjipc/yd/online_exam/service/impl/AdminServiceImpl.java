@@ -210,4 +210,25 @@ public class AdminServiceImpl implements AdminService {
     public int deleteQuestion(Integer id) {
         return questionMapper.deleteQuestion(id);
     }
+
+    @Override
+    public Long getTeacherCount() {
+       return teacherMapper.getTeacherCount();
+    }
+
+    @Override
+    public Long getStudentCount() {
+        return studentMapper.getStudentCount();
+    }
+
+    @Override
+    public Long getPaperCount() {
+        return paperMapper.getPaperCount();
+    }
+
+    @Override
+    public Long getQuestionCount() {
+        return questionMapper.getQuestionCount();
+    }
+
 }

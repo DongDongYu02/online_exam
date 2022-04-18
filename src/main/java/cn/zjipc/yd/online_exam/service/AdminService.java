@@ -223,4 +223,13 @@ public interface AdminService {
      * @param id 题目id
      */
     int deleteQuestion(Integer id);
+
+
+    Long getTeacherCount();
+
+    Long getStudentCount();
+
+    Long getPaperCount();
+
+    Long getQuestionCount();
 }

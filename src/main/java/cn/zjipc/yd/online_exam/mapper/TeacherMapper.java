@@ -40,4 +40,6 @@ public interface TeacherMapper {
      * 删除教师信息byId
      */
     int deleteTeacher(Integer id);
+
+    Long getTeacherCount();
 }

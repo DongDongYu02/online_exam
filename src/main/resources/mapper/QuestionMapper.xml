@@ -93,4 +93,7 @@
     <select id="getQuestionByQueName" resultType="cn.zjipc.yd.online_exam.bean.Question">
         select * from tb_question where upper(que_name) = upper(#{queName})
     </select>
+    <select id="getQuestionCount" resultType="java.lang.Long">
+        SELECT COUNT(id) FROM tb_question
+    </select>
 </mapper>

@@ -82,4 +82,7 @@
     <select id="getPaperByPapName" resultType="cn.zjipc.yd.online_exam.bean.Paper">
         select * from tb_paper where upper(pap_name) = upper(#{papName})
     </select>
+    <select id="getPaperCount" resultType="java.lang.Long">
+        SELECT COUNT(id) FROM tb_paper
+    </select>
 </mapper>

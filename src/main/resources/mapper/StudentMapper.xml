@@ -66,5 +66,8 @@
     <select id="getStudentByStuMajor" resultType="cn.zjipc.yd.online_exam.bean.Student">
         select * from tb_student where stu_major = #{stuMajor}
     </select>
+    <select id="getStudentCount" resultType="java.lang.Long">
+        SELECT COUNT(id) FROM tb_student
+    </select>
 
 </mapper>

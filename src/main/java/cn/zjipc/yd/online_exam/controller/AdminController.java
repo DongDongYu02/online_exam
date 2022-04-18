@@ -535,5 +535,37 @@ public class AdminController {
         }
         return new AjaxMsg(false, "删除失败");
     }
+
+    /**
+     * 统计系统教师人数接口
+     * @return 教师人数
+     */
+    @GetMapping("/teacherCount")
+    @ResponseBody
+    public AjaxMsg teacherCount(){
+       Long count = adminService.getTeacherCount();
+       return new AjaxMsg(true,"获取成功",count);
+    }
+
+    @GetMapping("/studentCount")
+    @ResponseBody
+    public AjaxMsg studentCount(){
+        Long count = adminService.getStudentCount();
+        return new AjaxMsg(true,"获取成功",count);
+    }
+
+    @GetMapping("/paperCount")
+    @ResponseBody
+    public AjaxMsg paperCount(){
+        Long count = adminService.getPaperCount();
+        return new AjaxMsg(true,"获取成功",count);
+    }
+
+    @GetMapping("/questionCount")
+    @ResponseBody
+    public AjaxMsg questionCount(){
+        Long count = adminService.getQuestionCount();
+        return new AjaxMsg(true,"获取成功",count);
+    }
 }
 

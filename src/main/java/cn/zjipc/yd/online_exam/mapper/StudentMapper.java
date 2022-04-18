@@ -54,4 +54,6 @@ public interface StudentMapper {
      * @param papName 试卷名字
      */
      Paper getPaperQuestionByPapName(String papName);
+
+    Long getStudentCount();
 }

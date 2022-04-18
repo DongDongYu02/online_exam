@@ -56,6 +56,8 @@ public interface PaperMapper {
      */
     Paper getPaperWithQuestionByPapName(String papName);
 
+    Long getPaperCount();
+
 //    /**
 //     * 根据试卷名获取对应题目列表
 //     * @param papName 试卷名称

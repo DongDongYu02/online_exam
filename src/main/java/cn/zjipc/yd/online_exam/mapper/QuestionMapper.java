@@ -80,4 +80,6 @@ public interface QuestionMapper {
      * 根据试卷名查询该试卷的所有判断题目
      */
     List<Question> getJudgeQuestionListByPapName(String papName);
+
+    Long getQuestionCount();
 }

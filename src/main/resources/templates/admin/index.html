@@ -5,6 +5,9 @@
     <title>Quick Test 后台管理</title>
     <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
     <link th:href="@{/css/dashboard.css}" rel="stylesheet">
+    <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
+    <script th:src="@{/js/axios.min.js}"></script>
+    <script th:src="@{/js/vue.min.js}"></script>
 </head>
 
 <body>
@@ -35,28 +38,76 @@
         <!--侧边栏 start-->
         <div class="col-sm-3 col-md-2 sidebar">
             <ul class="nav nav-sidebar">
-                <li  class="active"><a th:href="@{/admin}">HOME<span class="sr-only">(current)</span></a></li>
+                <li class="active"><a th:href="@{/admin}">HOME<span class="sr-only">(current)</span></a></li>
                 <li><a th:href="@{/admin/studentManage}">学生信息管理 <span class="sr-only">(current)</span></a></li>
                 <li><a th:href="@{/admin/teacherManage}">教师信息管理</a></li>
                 <li><a th:href="@{/admin/majorManage}">专业信息管理</a></li>
-                <li ><a th:href="@{/admin/adminManage}">管理员</a></li>
+                <li><a th:href="@{/admin/adminManage}">管理员</a></li>
             </ul>
 
             <ul class="nav nav-sidebar">
-                <li  class="active"><a>试卷/题库<span class="sr-only">(current)</span></a></li>
+                <li class="active"><a>试卷/题库<span class="sr-only">(current)</span></a></li>
                 <li><a th:href="@{/admin/paperManage}">试卷管理<span class="sr-only">(current)</span></a></li>
                 <li><a th:href="@{/admin/questionManage}">试题管理</a></li>
             </ul>
         </div>
-        <!--侧边栏 start-->
+        <!--侧边栏 end-->
 
-        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+        <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main" id="count" >
             <h2 class="sub-header">Quick Test 在线考试后台管理系统</h2>
+            <div class="col-xs-3 col-lg-2" style="text-align: center">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h4>系统教师人数</h4>
+                    </div>
+                    <div class="panel-body">
+                        <h3>
+                            {{teacherCount}}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3 col-lg-2" style="text-align: center">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h4>系统学生人数</h4>
+                    </div>
+                    <div class="panel-body">
+                        <h3>
+                            {{studentCount}}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3 col-lg-2" style="text-align: center">
+                <div class="panel panel-success">
+                    <div class="panel-heading">
+                        <h4>试卷套数</h4>
+                    </div>
+                    <div class="panel-body">
+                        <h3>
+                            {{paperCount}}
+                        </h3>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-3 col-lg-2" style="text-align: center">
+                <div class="panel panel-warning">
+                    <div class="panel-heading">
+                        <h4>题目总数</h4>
+                    </div>
+                    <div class="panel-body">
+                        <h3>
+                            {{questionCount}}
+                        </h3>
+                    </div>
+                </div>
+            </div>
 
         </div>
     </div>
 </div>
-
+<script th:src="@{/js/admin/index.js}"></script>
 <script th:src="@{/js/jquery-3.6.0.min.js}"></script>
 <script th:src="@{/js/bootstrap.min.js}"></script>
 

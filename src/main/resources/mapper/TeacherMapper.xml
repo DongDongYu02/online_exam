@@ -41,4 +41,7 @@
     <select id="getTeacherByIdAndPassword" resultType="cn.zjipc.yd.online_exam.bean.Teacher">
         select * from tb_teacher where `id` = #{id} and `tea_password` = #{teaPassword}
     </select>
+    <select id="getTeacherCount" resultType="java.lang.Long">
+        SELECT COUNT(id) FROM tb_teacher
+    </select>
 </mapper>

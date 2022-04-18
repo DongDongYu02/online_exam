@@ -20,11 +20,17 @@ public class SubmitAnswer {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         SubmitAnswer answer1 = (SubmitAnswer) o;
-        if (!Objects.equals(questionId, answer1.questionId)) return false;
+        if (!Objects.equals(questionId, answer1.questionId)) {
+            return false;
+        }
         //如果答案顺序不一样
         byte[] answerBytes = answer.getBytes();
         byte[] answerBytes1 = answer1.answer.getBytes();
