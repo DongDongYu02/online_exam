@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/teacher")
 public class TeacherController {
     @Autowired
@@ -27,7 +27,6 @@ public class TeacherController {
      * 获取教师信息
      */
     @GetMapping("/teacherInfo")
-    @ResponseBody
     public AjaxMsg teacherInfo(HttpSession session) {
         Teacher user = (Teacher) session.getAttribute("user");
         if (user != null) {
@@ -44,7 +43,6 @@ public class TeacherController {
      * @param pageNum  页码
      */
     @GetMapping("/myStudentInfo")
-    @ResponseBody
     public AjaxMsg myStudentInfo(String teaMajor, @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         PageHelper.startPage(pageNum, 8);
         List<Student> myStudentList = teacherService.getMyStudentList(teaMajor);
@@ -58,7 +56,6 @@ public class TeacherController {
      * @param id 学生id
      */
     @GetMapping("/checkStudentResult/{id}")
-    @ResponseBody
     public AjaxMsg checkStudentResult(@PathVariable Integer id) {
         List<StudentScores> studentResults = teacherService.getStudentResults(id);
         if (studentResults != null) {
@@ -74,7 +71,6 @@ public class TeacherController {
      * @param pageNum 页码 默认1
      */
     @GetMapping("/myPaperInfo/operate")
-    @ResponseBody
     public AjaxMsg myPaperList(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         Teacher user = (Teacher) session.getAttribute("user");
         if (user != null) {
@@ -93,7 +89,6 @@ public class TeacherController {
      * @param id 试卷id
      */
     @GetMapping("myPaperInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg getMyPaper(@PathVariable Integer id) {
         Paper paper = teacherService.getMyPaperById(id);
         if (paper != null) {
@@ -108,7 +103,6 @@ public class TeacherController {
      * @param papName 试卷名称
      */
     @GetMapping("myPaperInfo/checkPaperName")
-    @ResponseBody
     public AjaxMsg checkPapName(String papName) {
         if(teacherService.checkPapName(papName) != null){
             return new AjaxMsg(false,"试卷已存在");
@@ -123,7 +117,6 @@ public class TeacherController {
      * @param session 获取session的用户信息
      */
     @PostMapping("/myPaperInfo/operate")
-    @ResponseBody
     public AjaxMsg addMyPaper(Paper paper, HttpSession session) {
         Object user = session.getAttribute("user");
         if (user instanceof Teacher) {
@@ -143,7 +136,6 @@ public class TeacherController {
      * @param paper 封装了试卷信息的对象
      */
     @PutMapping("/myPaperInfo/operate")
-    @ResponseBody
     public AjaxMsg updateMyPaper(Paper paper) {
         if (teacherService.updateMyPaper(paper) > 0) {
             return new AjaxMsg(true, "修改成功");
@@ -157,7 +149,6 @@ public class TeacherController {
      * @param id 试卷id
      */
     @DeleteMapping("/myPaperInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg deleteMyPaper(@PathVariable Integer id) {
         if (teacherService.deleteMyPaper(id) > 0) {
             return new AjaxMsg(true, "删除成功");
@@ -170,7 +161,6 @@ public class TeacherController {
      * 保存当前试卷的试卷名
      */
     @GetMapping("/myPaperInfo/savePapName")
-    @ResponseBody
     public AjaxMsg savePapName(String papName, HttpServletRequest request) {
         request.getSession().setAttribute("papName", papName);
         return new AjaxMsg(true, WebUtil.getRequestIP(request));
@@ -183,7 +173,6 @@ public class TeacherController {
      * @param session 获取session中的试卷名称
      */
     @GetMapping("/myPaperInfo/questions")
-    @ResponseBody
     public AjaxMsg getQuestions(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum, HttpSession session) {
         String papName = (String) session.getAttribute("papName");
         PageHelper.startPage(pageNum, 8);
@@ -198,7 +187,6 @@ public class TeacherController {
      * @param id 题目id
      */
     @GetMapping("/myPaperInfo/questions/{id}")
-    @ResponseBody
     public AjaxMsg getQuestionById(@PathVariable Integer id) {
         Question q = teacherService.getQuestionById(id);
         if (q != null) {
@@ -214,7 +202,6 @@ public class TeacherController {
      * @param question 封装了题目信息的对象
      */
     @PostMapping("/myPaperInfo/questions")
-    @ResponseBody
     public AjaxMsg addQuestion(Question question, HttpSession session) {
         String papName = (String) session.getAttribute("papName");
         if (teacherService.addQuestion(question, papName) > 0) {
@@ -229,7 +216,6 @@ public class TeacherController {
      * @param question 封装了题目信息的对象
      */
     @PutMapping("/myPaperInfo/questions")
-    @ResponseBody
     public AjaxMsg updateQuestion(Question question) {
         if (teacherService.updateQuestion(question) > 0) {
             return new AjaxMsg(true, "修改成功");
@@ -243,7 +229,6 @@ public class TeacherController {
      * @param id 题目id
      */
     @DeleteMapping("myPaperInfo/questions/{id}")
-    @ResponseBody
     public AjaxMsg deleteQuestion(@PathVariable Integer id) {
         if (teacherService.deleteQuestion(id) > 0) {
             return new AjaxMsg(true, "删除成功");

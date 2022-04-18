@@ -15,7 +15,7 @@ import javax.servlet.http.HttpSession;
 import java.text.ParseException;
 import java.util.List;
 
-@Controller
+@RestController
 @RequestMapping("/student")
 public class StudentController {
 
@@ -28,7 +28,6 @@ public class StudentController {
      * @param session 获取session中的用户
      */
     @GetMapping("myExamList")
-    @ResponseBody
     public AjaxMsg myExamList(HttpSession session) {
         Object user = session.getAttribute("user");
         if (user instanceof Student) {
@@ -46,7 +45,6 @@ public class StudentController {
      * @param papName 试卷名称
      */
     @GetMapping("startExam")
-    @ResponseBody
     public AjaxMsg startExam(String papName, HttpServletRequest request) {
         Object user = request.getSession().getAttribute("user");
         if (user instanceof Student) {
@@ -71,7 +69,6 @@ public class StudentController {
      * @param session 从session中获取试卷名称
      */
     @GetMapping("examPaper")
-    @ResponseBody
     public AjaxMsg getExamPaper(HttpSession session) throws ParseException {
         String papName = (String) session.getAttribute("papName");
         Student student = (Student) session.getAttribute("user");
@@ -96,7 +93,6 @@ public class StudentController {
      * @param pageNum 页码/第几题？
      */
     @GetMapping("paperQuestion")
-    @ResponseBody
     public AjaxMsg getPaperQuestion(HttpSession session, @RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         String papName = (String) session.getAttribute("papName");
         Student user = (Student) session.getAttribute("user");
@@ -111,7 +107,6 @@ public class StudentController {
     }
 
     @GetMapping("saveAnswer")
-    @ResponseBody
     public AjaxMsg saveAnswer(HttpSession session, String queId, String answer) {
         Student user = (Student) session.getAttribute("user");
         studentService.saveAnswer(String.valueOf(user.getId()), queId, answer);
@@ -123,7 +118,6 @@ public class StudentController {
      *
      */
     @PostMapping("/submitExam")
-    @ResponseBody
     public AjaxMsg submitExam( HttpServletRequest request) {
         Object user = request.getSession().getAttribute("user");
         if (user instanceof Student) {
@@ -142,7 +136,6 @@ public class StudentController {
      * @param pageNum 页码
      */
     @GetMapping("/myResults")
-    @ResponseBody
     public AjaxMsg myResults(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum, HttpSession session) {
         Object user = session.getAttribute("user");
         if (user instanceof Student) {
@@ -161,7 +154,6 @@ public class StudentController {
      * @param papName 试卷名称
      */
     @GetMapping("/checkPaperDone")
-    @ResponseBody
     public AjaxMsg checkPaperDone(String papName, HttpSession session) {
         Object user = session.getAttribute("user");
         if (user instanceof Student) {

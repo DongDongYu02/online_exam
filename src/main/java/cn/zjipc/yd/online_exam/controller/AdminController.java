@@ -18,7 +18,7 @@ import java.net.URLEncoder;
 import java.util.List;
 
 @Slf4j
-@Controller
+@RestController
 @RequestMapping("/admin")
 public class AdminController {
     private final AdminService adminService;
@@ -32,7 +32,6 @@ public class AdminController {
      * 获取管理员列表的分页数据
      */
     @GetMapping("/adminInfo/operate")
-    @ResponseBody
     public AjaxMsg operate(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum) {
         PageHelper.startPage(pageNum, 8);
         List<Admin> adminList = adminService.getAdminList();
@@ -46,7 +45,6 @@ public class AdminController {
      * @param id 管理员id
      */
     @GetMapping("/adminInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg operate(@PathVariable Integer id) {
         Admin admin = adminService.getAdminById(id);
         if (admin != null) {
@@ -61,7 +59,6 @@ public class AdminController {
      * @param username 用户名
      */
     @GetMapping("/adminInfo/checkUsername")
-    @ResponseBody
     public AjaxMsg checkUsername(String username) {
         if (adminService.getAdminByUsername(username) != null) {
             return new AjaxMsg(false, "用户名已存在");
@@ -75,7 +72,6 @@ public class AdminController {
      * @param admin 封装了管理员信息的对象
      */
     @PostMapping("/adminInfo/operate")
-    @ResponseBody
     public AjaxMsg saveAdmin(Admin admin) {
         if (adminService.saveAdmin(admin) > 0) {
             return new AjaxMsg(true, "添加成功");
@@ -89,7 +85,6 @@ public class AdminController {
      * @param admin 封装了管理员信息的对象
      */
     @PutMapping("/adminInfo/operate")
-    @ResponseBody
     public AjaxMsg updateAdmin(Admin admin) {
         if (adminService.updateAdmin(admin) > 0) {
             return new AjaxMsg(true, "修改成功");
@@ -103,7 +98,6 @@ public class AdminController {
      * @param id 管理员id
      */
     @DeleteMapping("/adminInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg deleteAdmin(@PathVariable Integer id) {
         if (adminService.deleteAdminById(id) > 0) {
             return new AjaxMsg(true, "删除成功");
@@ -118,7 +112,6 @@ public class AdminController {
      * @param pageNum 页码
      */
     @GetMapping("/teacherInfo/operate")
-    @ResponseBody
     public AjaxMsg getTeacherList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum) {
         PageHelper.startPage(pageNum, 8);
         List<Teacher> teacherList = adminService.getTeacherList();
@@ -132,7 +125,6 @@ public class AdminController {
      * @param teacher 封装了教师信息的对象
      */
     @PostMapping("/teacherInfo/operate")
-    @ResponseBody
     public AjaxMsg addTeacher(Teacher teacher) {
         if (adminService.addTeacher(teacher) > 0) {
             return new AjaxMsg(true, "添加成功");
@@ -146,7 +138,6 @@ public class AdminController {
      * @param teacher 封装了教师信息的对象
      */
     @PutMapping("/teacherInfo/operate")
-    @ResponseBody
     public AjaxMsg updateTeacher(Teacher teacher) {
         if (adminService.updateTeacher(teacher) > 0) {
             return new AjaxMsg(true, "修改成功");
@@ -159,7 +150,6 @@ public class AdminController {
      * 修改时回显教师信息
      */
     @GetMapping("/teacherInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg getTeacherById(@PathVariable Integer id) {
         Teacher t = adminService.getTeacherById(id);
         if (t != null) {
@@ -172,7 +162,6 @@ public class AdminController {
      * 根据id删除教师
      */
     @DeleteMapping("/teacherInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg deleteTeacher(@PathVariable Integer id) {
         if (adminService.deleteTeacherById(id) > 0) {
             return new AjaxMsg(true, "删除成功");
@@ -187,7 +176,6 @@ public class AdminController {
      * @param pageNum 页码
      */
     @GetMapping("/studentInfo/operate")
-    @ResponseBody
     public AjaxMsg getStudentList(@RequestParam(value = "pageNum", defaultValue = "1") int pageNum) {
         PageHelper.startPage(pageNum, 8);
         List<Student> studentList = adminService.getStudentList();
@@ -202,7 +190,6 @@ public class AdminController {
      * @param id 学生id
      */
     @GetMapping("/studentInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg getStudentById(@PathVariable Integer id) {
         Student student = adminService.getStudentById(id);
         if (student != null) {
@@ -218,7 +205,6 @@ public class AdminController {
      * @param student 封装学生信息的对象
      */
     @PostMapping("/studentInfo/operate")
-    @ResponseBody
     public AjaxMsg addStudent(Student student) {
         if (adminService.addStudent(student) > 0) {
             return new AjaxMsg(true, "添加成功");
@@ -232,7 +218,6 @@ public class AdminController {
      * @param student 封装了学生信息的对象
      */
     @PutMapping("/studentInfo/operate")
-    @ResponseBody
     public AjaxMsg updateStudent(Student student) {
         if (adminService.updateStudent(student) > 0) {
             return new AjaxMsg(true, "修改成功");
@@ -246,7 +231,6 @@ public class AdminController {
      * @param id 学生id
      */
     @DeleteMapping("/studentInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg deleteStudent(@PathVariable Integer id) {
         if (adminService.deleteStudentById(id) > 0) {
             return new AjaxMsg(true, "删除成功");
@@ -262,7 +246,6 @@ public class AdminController {
      * @param pageNum 页码
      */
     @GetMapping("/majorInfo/operate")
-    @ResponseBody
     public AjaxMsg getMajorList(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         PageHelper.startPage(pageNum, 8);
         List<Major> majorList = adminService.getMajorList();
@@ -275,7 +258,6 @@ public class AdminController {
      * 添加学生、教师信息时，专业选择下拉框的数据
      */
     @GetMapping("/majorInfo/allMajor")
-    @ResponseBody
     public AjaxMsg getMajorList() {
         List<Major> majorList = adminService.getMajorList();
         return new AjaxMsg(true, "查询成功", majorList);
@@ -288,7 +270,6 @@ public class AdminController {
      * @param id 专业id
      */
     @GetMapping("/majorInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg getMajor(@PathVariable Integer id) {
         Major major = adminService.getMajorById(id);
         if (major != null) {
@@ -301,7 +282,6 @@ public class AdminController {
      * 检查专业名称是否已存在
      */
     @GetMapping("/majorInfo/checkMajorName")
-    @ResponseBody
     public AjaxMsg checkMajorName(String majName) {
         if (adminService.checkMajorName(majName) != null) {
             return new AjaxMsg(false, "专业名已存在");
@@ -315,7 +295,6 @@ public class AdminController {
      * @param major 封装了专业信息的对象
      */
     @PostMapping("/majorInfo/operate")
-    @ResponseBody
     public AjaxMsg addMajor(Major major) {
         if (adminService.addMajor(major) > 0) {
             return new AjaxMsg(true, "添加成功");
@@ -329,7 +308,6 @@ public class AdminController {
      * @param major 封装了专业信息的对象
      */
     @PutMapping("/majorInfo/operate")
-    @ResponseBody
     public AjaxMsg updateMajor(Major major) {
         if (adminService.updateMajor(major) > 0) {
             return new AjaxMsg(true, "修改成功");
@@ -343,7 +321,6 @@ public class AdminController {
      * @param id 专业id
      */
     @DeleteMapping("/majorInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg deleteMajor(@PathVariable Integer id) {
         if (adminService.deleteMajorById(id) > 0) {
             return new AjaxMsg(true, "删除成功");
@@ -358,7 +335,6 @@ public class AdminController {
      * @param pageNum 页码
      */
     @GetMapping("/paperInfo/operate")
-    @ResponseBody
     public AjaxMsg getAllPaper(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         PageHelper.startPage(pageNum, 8);
         List<Paper> allPaper = adminService.getAllPaper();
@@ -370,7 +346,6 @@ public class AdminController {
      * 获取试卷列表
      */
     @GetMapping("/paperInfo/allPaper")
-    @ResponseBody
     public AjaxMsg allPaper() {
         List<Paper> allPaper = adminService.getAllPaper();
         return new AjaxMsg(true, "查询成功", allPaper);
@@ -382,7 +357,6 @@ public class AdminController {
      * @param id 试卷id
      */
     @GetMapping("/paperInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg getPaperById(@PathVariable Integer id) {
         Paper paper = adminService.getPaperById(id);
         if (paper != null) {
@@ -398,7 +372,6 @@ public class AdminController {
      * @param papName 试卷名称
      */
     @GetMapping("/paperInfo/checkPaperName")
-    @ResponseBody
     public AjaxMsg checkPaperName(String papName) {
         if (adminService.checkPapName(papName) != null) {
             return new AjaxMsg(false, "试卷已存在");
@@ -412,7 +385,6 @@ public class AdminController {
      * @param paper 封装了试卷信息的对象
      */
     @PostMapping("/paperInfo/operate")
-    @ResponseBody
     public AjaxMsg addPaper(Paper paper) {
         if (adminService.addPaper(paper) > 0) {
             return new AjaxMsg(true, "添加成功");
@@ -426,7 +398,6 @@ public class AdminController {
      * @param paper 封装了试卷信息的对象
      */
     @PutMapping("/paperInfo/operate")
-    @ResponseBody
     public AjaxMsg updatePaper(Paper paper) {
         if (adminService.updatePaper(paper) > 0) {
             return new AjaxMsg(true, "修改成功");
@@ -440,7 +411,6 @@ public class AdminController {
      * @param id 试卷id
      */
     @DeleteMapping("/paperInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg deletePaper(@PathVariable Integer id) {
         if (adminService.deletePaper(id) > 0) {
             return new AjaxMsg(true, "删除成功");
@@ -455,7 +425,6 @@ public class AdminController {
      * @param pageNum 页码
      */
     @GetMapping("/questionInfo/operate")
-    @ResponseBody
     public AjaxMsg getAllQuestion(@RequestParam(value = "pageNum", defaultValue = "1") Integer pageNum) {
         PageHelper.startPage(pageNum, 8);
         List<Question> allQuestion = adminService.getAllQuestion();
@@ -469,7 +438,6 @@ public class AdminController {
      * @param id 题目id
      */
     @GetMapping("/questionInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg getQuestionById(@PathVariable Integer id) {
         Question q = adminService.getQuestionById(id);
         if (q != null) {
@@ -484,7 +452,6 @@ public class AdminController {
      * @param queName 题目名
      */
     @GetMapping("questionInfo/checkQueName")
-    @ResponseBody
     public AjaxMsg checkQueName(String queName) {
         if (adminService.checkQueName(queName) != null) {
             return new AjaxMsg(false, "题目已存在");
@@ -498,7 +465,6 @@ public class AdminController {
      * @param question 封装了题目信息的对象
      */
     @PostMapping("/questionInfo/operate")
-    @ResponseBody
 
     public AjaxMsg addQuestion(Question question) {
         question.setQueName(question.getQueName().replaceAll(" ", "+"));
@@ -514,7 +480,6 @@ public class AdminController {
      * @param question 封装了题目信息的对象
      */
     @PutMapping("/questionInfo/operate")
-    @ResponseBody
     public AjaxMsg updateQuestion(Question question) throws UnsupportedEncodingException {
         question.setQueName(question.getQueName().replaceAll(" ", "+"));
         if (adminService.updateQuestion(question) > 0) {
@@ -529,7 +494,6 @@ public class AdminController {
      * @param id 题目id
      */
     @DeleteMapping("/questionInfo/operate/{id}")
-    @ResponseBody
     public AjaxMsg deleteQuestion(@PathVariable Integer id) {
         if (adminService.deleteQuestion(id) > 0) {
             return new AjaxMsg(true, "删除成功");
@@ -543,7 +507,6 @@ public class AdminController {
      * @return 教师人数
      */
     @GetMapping("/teacherCount")
-    @ResponseBody
     public AjaxMsg teacherCount() {
         Long count = adminService.getTeacherCount();
         return new AjaxMsg(true, "获取成功", count);
@@ -556,7 +519,6 @@ public class AdminController {
      * @return
      **/
     @GetMapping("/studentCount")
-    @ResponseBody
     public AjaxMsg studentCount() {
         Long count = adminService.getStudentCount();
         return new AjaxMsg(true, "获取成功", count);
@@ -569,7 +531,6 @@ public class AdminController {
      * @return
      **/
     @GetMapping("/paperCount")
-    @ResponseBody
     public AjaxMsg paperCount() {
         Long count = adminService.getPaperCount();
         return new AjaxMsg(true, "获取成功", count);
@@ -582,7 +543,6 @@ public class AdminController {
     * @return
     **/
     @GetMapping("/questionCount")
-    @ResponseBody
     public AjaxMsg questionCount() {
         Long count = adminService.getQuestionCount();
         return new AjaxMsg(true, "获取成功", count);
